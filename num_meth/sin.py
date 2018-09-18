@@ -3,8 +3,6 @@ import numpy as np
 import math
 import decimal
 
-
-FUNCTIONS = {1: "x", 2: "x"}
 NUMBER_OF_FUNCTIONS = 10
 
 def taylor_sin(arg, number_of_elements):
@@ -13,21 +11,29 @@ def taylor_sin(arg, number_of_elements):
         res += ((-1) ** i) * (arg ** (2 * i + 1)) / math.factorial(2 * i + 1)
     return res
 
-ax = plt.subplot()
+def partial_sum(sequence_func, args, number_of_elements):
+    seq_part = []
+    for arg in args:        
+        seq_part.append(sequence_func(arg, number_of_elements))
+    return seq_part
 
-x = np.arange(-2 * np.pi, 2 * np.pi, 0.01)
-y = np.sin(x)
-plt.ylim(-2, 2)
+def create_sin(x_args):
+    y = np.sin(x_args)
+    plt.plot(x_args, y, color='black', linewidth=2)
 
-for fn_num in range(NUMBER_OF_FUNCTIONS):
-    new_sin = []
-    for arg in x:        
-        new_sin.append(taylor_sin(arg, fn_num))
-    plt.plot(x, new_sin)
+def create_sin_approximation(args):
+    plt.ylim(-2, 2)
+    for elem_num in range(NUMBER_OF_FUNCTIONS):
+        plt.plot(args, partial_sum(taylor_sin, args, elem_num), label='n={}'.format(elem_num))
     
-plt.plot(x, y, color='black', linewidth=2)
-plt.grid(True)
-
-plt.show()
-
-
+def main():
+    ax = plt.subplots()
+    args = np.arange(-2 * np.pi, 2 * np.pi, 0.01)
+    create_sin_approximation(args)
+    create_sin(args)
+    plt.grid(True)
+    ax.legend(ncol=ncols, loc='best')
+    
+if __name__ == "__main__":
+    main()
+    plt.show()
