@@ -43,6 +43,8 @@ def create_approximation(func, number_of_members, accuracy):
 
 def plot_approximation_result(approximation_result):
     plt.plot(approximation_result.keys(), approximation_result.values(), 'ro', label='approximate value')
+    for num, value in approximation_result.items():
+        plt.annotate(value, (num, value))
     plt.xticks(np.arange(int(min(approximation_result.keys()) - 1),
                          int(max(approximation_result.keys()) + 1),
                          1))
