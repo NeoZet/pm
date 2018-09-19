@@ -26,9 +26,8 @@ def plot_sin(x_args):
 
 
 def plot_partial_sums(func_sequence, args, number_of_members):
-    plt.ylim(-2, 2)
     for elem_num in range(number_of_members):
-        plt.plot(args, partial_sum(func_sequence, args, elem_num), label='$n={}$'.format(elem_num))
+        plt.plot(args, partial_sum(func_sequence, args, elem_num), label='$n={}$'.format(elem_num + 1))
 
 
 def create_approximation(func, number_of_members, accuracy):
@@ -44,16 +43,24 @@ def create_approximation(func, number_of_members, accuracy):
 
 def plot_approximation_result(approximation_result):
     plt.plot(approximation_result.keys(), approximation_result.values(), 'ro', label='approximate value')
-    plt.xticks(np.arange(0, max(approximation_result.keys()) + 1, 1))
-    plt.yticks(np.arange(0, max(approximation_result.values()) +1, 0.5))
+    plt.xticks(np.arange(int(min(approximation_result.keys()) - 1),
+                         int(max(approximation_result.keys()) + 1),
+                         1))
+    plt.yticks(np.arange(int(min(approximation_result.values()) - 1),
+                         int(max(approximation_result.values()) + 1),
+                         0.5))
 
 
 def final_plot():
     args = np.arange(-3 * np.pi, 3 * np.pi, 0.01)
     plt.figure(1)
-    plot_partial_sums(taylor_sin, args, NUMBER_OF_FUNCTIONS)    
+    plot_partial_sums(taylor_sin, args, NUMBER_OF_FUNCTIONS)
+    plt.ylim(-2, 2)
     plot_sin(args)
 
+    text_note = "Note: 'n' - number of elements in partial\nsum of Taylor series for sin"
+    plt.text(4, -2.5, text_note, fontsize=7)
+    plt.subplots_adjust(right=0.9)
     plt.legend(loc=3, ncol=6, mode="expand")
     plt.title("Approximation by curves for " + r"$y=sin(x)$")
     plt.xlabel('X, [rad]')
@@ -61,8 +68,9 @@ def final_plot():
     plt.grid(True)
     
     plt.figure(2)
-    plot_approximation_result(create_approximation(taylor_sin, NUMBER_OF_FUNCTIONS, ACCURACY))
-
+    plot_approximation_result(create_approximation(taylor_sin,
+                                                   NUMBER_OF_FUNCTIONS,
+                                                   ACCURACY))
     plt.legend(loc=2)
     plt.title("Approximation of " + r"$y=sin(x)$" + " with accuracy = {}".format(ACCURACY))
     plt.xlabel('Iterations, [ ]')
