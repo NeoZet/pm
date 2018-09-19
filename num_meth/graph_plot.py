@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
+import argparse
+import decimal
 
 GRAPH_DATA_FILE = "graph_data.txt"
 
@@ -34,12 +36,12 @@ def __get_y(n, x_coord, y_coord):
         elif n == m3:
             return t3
         return findY(n,
-                     float('{:.3f}'.format(m1)),
-                     float('{:.3f}'.format(m2)),
-                     float('{:.3f}'.format(m3)),
-                     float('{:.3f}'.format(t1)),
-                     float('{:.3f}'.format(t2)),
-                     float('{:.3f}'.format(t3)))
+                     float('{:.10f}'.format(m1)),
+                     float('{:.10f}'.format(m2)),
+                     float('{:.10f}'.format(m3)),
+                     float('{:.10f}'.format(t1)),
+                     float('{:.10f}'.format(t2)),
+                     float('{:.10f}'.format(t3)))
     return findY(n, m1, m2, m3, t1, t2, t3)
 
 def getY(x, x_coord, y_coord):    
@@ -51,16 +53,29 @@ def getY(x, x_coord, y_coord):
     else:
         return __get_y(x, x_coord, y_coord)
 
-
+def create_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-x_coord", help="print point on plot by X coordinate", type=float)
+    return parser
+    
     
 def main():
+    parser = create_parser()
+    args = parser.parse_args()
+
     coords = _read_coords(GRAPH_DATA_FILE)
     x_crd = [coord[0] for coord in coords]
     y_crd = [coord[1] for coord in coords]
-    
-    print(getY(260.2, x_crd, y_crd))
-    
     plt.plot(x_crd, y_crd)
+
+    if args.x_coord and args.x_coord >= min(x_crd) and args.x_coord <= max(x_crd):
+        y = getY(args.x_coord, x_crd, y_crd) 
+        plt.plot(args.x_coord, y, 'ro')
+        plt.annotate("[{0}, {1}]".format(args.x_coord, y),
+                     (args.x_coord, y))
+    elif args.x_coord:
+        print("Invalid argument", file=sys.stderr)
+
     plt.grid(True)
 
 if __name__ == "__main__":
