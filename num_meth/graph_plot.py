@@ -91,7 +91,28 @@ def Newton_interpolation_polynomial(x, x_list, y_list):
     
 def create_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-x_coord", help="print point on plot by X coordinate", type=float)
+    subparsers = parser.add_subparsers(dest="command")
+    
+    parser_polynom = subparsers.add_parser('polynom', help='work with polynomial')
+    parser_polynom.add_argument('-ip', '--interpolation_polynomial',
+                                dest="interpolation_polynom",
+                                help='specifing interpolation polynomial (Lagrange or Newton, both by default)',
+                                default='')
+    parser_polynom.add_argument('-x', '--x_list',
+                                dest="x_list",
+                                help='list of x values ("1 2 3", for expample)',
+                                type=str)
+    parser_polynom.add_argument('-y', '--y_list',
+                                dest="y_list",
+                                help='list of y(x) values ("1 2 3", for expample)',
+                                type=str)
+    parser.add_argument('-f', '--filename',
+                        dest="filename",
+                        help="print point on plot by X coordinate",
+                        type=str)
+    parser.add_argument("-x_coord",
+                        help="print point on plot by X coordinate",
+                        type=float)
     return parser
     
     
@@ -99,22 +120,39 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
 
-    coords = _read_coords(GRAPH_DATA_FILE)
+    if args.filename:
+        coords = _read_coords(args.filename)
+    else:        
+        coords = _read_coords(GRAPH_DATA_FILE)
+        if not coords:
+            print("Error! File with coordinates are apsent", file=sys.stderr)
+            exit(1)
     x_crd = [coord[0] for coord in coords]
     y_crd = [coord[1] for coord in coords]
-    plt.plot(x_crd, y_crd)
-    lagr_y = [Lagrange_interpolation_polynomial(x, [0, 124, 176, 244, 287], [160, 16, 41, 6.5, 163]) for x in x_crd]
-    newt_y = [Newton_interpolation_polynomial(x, [0, 124, 176, 244, 287], [160, 16, 41, 6.5, 163]) for x in x_crd]
-    plt.plot(x_crd, newt_y)    
-    
+    plt.plot(x_crd, y_crd, label = 'Pit plot')        
+
+    if args.command == 'polynom':
+        if not args.x_list or not args.y_list:
+            print('WARNING! Incorrect points lists')
+            args.interpolation_polynom = False
+        if args.interpolation_polynom and args.interpolation_polynom == 'Lagrange':
+            x_list = [float(x) for x in args.x_list.split(' ')]
+            y_list = [float(y) for y in args.y_list.split(' ')]        
+            lagr_y = [Lagrange_interpolation_polynomial(x, x_list, y_list) for x in x_crd]
+            plt.plot(x_crd, lagr_y, linewidth = 2, label = 'Lagrange interpolation polynomial')
+        elif args.interpolation_polynom and args.interpolation_polynom == 'Newton':
+            x_list = [float(x) for x in args.x_list.split(' ')] if args.x_list else []
+            y_list = [float(y) for y in args.y_list.split(' ')] if args.y_list else []
+            newt_y = [Newton_interpolation_polynomial(x, x_list, y_list) for x in x_crd]
+            plt.plot(x_crd, newt_y, linewidth = 2, color = 'black', label = 'Newton interpolation polynomial')    
     if args.x_coord and args.x_coord >= min(x_crd) and args.x_coord <= max(x_crd):
         y = getY(args.x_coord, x_crd, y_crd) 
         plt.plot(args.x_coord, y, 'ro')
-        plt.annotate("[{0}, {1}]".format(args.x_coord, y),
-                     (args.x_coord, y))
+        plt.annotate("[{0}, {1}]".format(args.x_coord, y), (args.x_coord, y))
     elif args.x_coord:
         print("Invalid argument", file=sys.stderr)
 
+    plt.legend(loc=2)
     plt.grid(True)
 
 if __name__ == "__main__":
