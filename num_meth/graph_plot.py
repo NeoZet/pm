@@ -55,11 +55,10 @@ def getY(x, x_coord, y_coord):
         return __get_y(x, x_coord, y_coord)
 
 
-def Lagrange_interpotale_polinom(x, x_list, y_list):
+def Lagrange_interpolation_polynomial(x, x_list, y_list):
     if len(x_list) != len(y_list):
         print("Error! Invalid argument", file=sys.stderr)
         return 'e'
-
     L = 0    
     for i in range(len(y_list)):         
         p = 1
@@ -68,7 +67,27 @@ def Lagrange_interpotale_polinom(x, x_list, y_list):
                 p *= ((x - x_list[j]) / (x_list[i] - x_list[j]))
         L += y_list[i] * p
     return L
-    
+
+
+def Newton_interpolation_polynomial(x, x_list, y_list):
+    if len(x_list) != len(y_list):
+        print("Error! Invalid argument", file=sys.stderr)
+        return 'e'
+    P = y_list[0]
+    for k in range(2, len(y_list)+1):
+        f_k = 0
+        for i in range(k):
+            pk_x = 1
+            for j in range(k):
+                if j != i:
+                   pk_x *= x_list[i] - x_list[j]            
+            f_k += y_list[i] / pk_x
+        p_x = 1
+        for i in range(k-1):
+            p_x *= x - x_list[i]
+        P += f_k * p_x
+    return P
+        
     
 def create_parser():
     parser = argparse.ArgumentParser()
@@ -84,8 +103,9 @@ def main():
     x_crd = [coord[0] for coord in coords]
     y_crd = [coord[1] for coord in coords]
     plt.plot(x_crd, y_crd)
-    lagr_y = [Lagrange_interpotale_polinom(x, [0, 124, 176, 244, 287], [160, 16, 41, 6.5, 163]) for x in x_crd]
-    plt.plot(x_crd, lagr_y)    
+    lagr_y = [Lagrange_interpolation_polynomial(x, [0, 124, 176, 244, 287], [160, 16, 41, 6.5, 163]) for x in x_crd]
+    newt_y = [Newton_interpolation_polynomial(x, [0, 124, 176, 244, 287], [160, 16, 41, 6.5, 163]) for x in x_crd]
+    plt.plot(x_crd, newt_y)    
     
     if args.x_coord and args.x_coord >= min(x_crd) and args.x_coord <= max(x_crd):
         y = getY(args.x_coord, x_crd, y_crd) 
