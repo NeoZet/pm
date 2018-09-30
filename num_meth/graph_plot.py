@@ -4,7 +4,7 @@ import sys
 import argparse
 import decimal
 
-GRAPH_DATA_FILE = "graph_data.txt"
+GRAPH_DATA_FILE = "graph_data.csv"
 
 def _read_coords(filename):
     with open(filename, "r") as coords_file:
