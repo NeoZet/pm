@@ -8,7 +8,7 @@ GRAPH_DATA_FILE = "graph_data.txt"
 
 def _read_coords(filename):
     with open(filename, "r") as coords_file:
-        return [[float(elem) for elem in coord.split(' ')] for coord in coords_file.readlines()]
+        return [[float(elem) for elem in coord.split(',')] for coord in coords_file.readlines()]
 
 
 def getY(x, x_coord, y_coord):
