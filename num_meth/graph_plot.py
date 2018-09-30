@@ -155,7 +155,6 @@ def main():
             plt.plot(x_crd, lagr_y, linewidth=3, color='orange', label='Lagrange interpolation polynomial')        
             plt.plot(x_crd, newt_y, linewidth=1, color='black', label='Newton interpolation polynomial')
 
-    print(args)
     if args.x_coord and args.x_coord >= min(x_crd) and args.x_coord <= max(x_crd):
         y = getY(args.x_coord, x_crd, y_crd) 
         plt.plot(args.x_coord, y, marker='o', markersize=4)
@@ -163,7 +162,8 @@ def main():
     elif args.x_coord:
         print("Invalid argument", file=sys.stderr)
 
-    plt.legend(loc=2)
+    plt.ylim(min(y_crd) - 20, max(y_crd) + 20)  
+    plt.legend(loc='best')
     plt.grid(True)
 
 if __name__ == "__main__":
