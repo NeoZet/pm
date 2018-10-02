@@ -22,7 +22,7 @@ public class DaoPerson implements DaoInterface<Person> {
 			person.setFirstName(rs.getString("FIRST_NAME"));
 			person.setLastName(rs.getString("LAST_NAME"));
 			person.setAge(rs.getInt("AGE"));
-			// person.setID(rs.getInt("ID"));
+			person.setID(rs.getInt("ID"));
 			return person;
 		} catch (SQLException e) {
 			throw new RuntimeException("Error connecting to the database", e);
@@ -36,20 +36,21 @@ public class DaoPerson implements DaoInterface<Person> {
 			Class.forName(JDBC_DRIVER).newInstance();
 			conn = connection;
 			stmt = statement;
-			stmt.execute("CREATE TABLE PERSONS (FIRST_NAME VARCHAR(255), LAST_NAME VARCHAR(255), AGE INTEGER)");
+			stmt.execute("CREATE TABLE PERSONS (ID INTEGER, FIRST_NAME VARCHAR(255), LAST_NAME VARCHAR(255), AGE INTEGER)");
 
-			stmt.execute("INSERT INTO PERSONS VALUES ('Erofei', 'Pavlov', 23)");
-			stmt.execute("INSERT INTO PERSONS VALUES ('Erofei', 'Ivanov', 19)");
-			stmt.execute("INSERT INTO PERSONS VALUES ('Ivan', 'Emin', 20)");
-			stmt.execute("INSERT INTO PERSONS VALUES ('Jhon', 'Smirnov', 21)");
-			stmt.execute("INSERT INTO PERSONS VALUES ('Semyon', 'Pavlov', 20)");
-			stmt.execute("INSERT INTO PERSONS VALUES ('Andrey', 'Novov', 19)");
-			stmt.execute("INSERT INTO PERSONS VALUES ('Anton', 'Emin', 18)");
-			stmt.execute("INSERT INTO PERSONS VALUES ('Genry', 'Smirnov', 21)");
-			stmt.execute("INSERT INTO PERSONS VALUES ('Genry', 'Pavlov', 20)");
-			stmt.execute("INSERT INTO PERSONS VALUES ('Anton', 'No', 19)");
-			stmt.execute("INSERT INTO PERSONS VALUES ('Anton', 'Emin', 18)");
-			ResultSet rs = stmt.executeQuery("SELECT * FROM PERSONS WHERE FIRST_NAME='Anton' or FIRST_NAME='Jhon'");
+			stmt.execute("INSERT INTO PERSONS VALUES (1111, 'Erofei', 'Pavlov', 23)");
+			stmt.execute("INSERT INTO PERSONS VALUES (1112, 'Erofei', 'Ivanov', 19)");
+			stmt.execute("INSERT INTO PERSONS VALUES (1121, 'Ivan', 'Emin', 20)");
+			stmt.execute("INSERT INTO PERSONS VALUES (1211, 'Jhon', 'Smirnov', 21)");
+			stmt.execute("INSERT INTO PERSONS VALUES (2111, 'Semyon', 'Pavlov', 20)");
+			stmt.execute("INSERT INTO PERSONS VALUES (1311, 'Andrey', 'Novov', 19)");
+			stmt.execute("INSERT INTO PERSONS VALUES (4111, 'Anton', 'Emin', 18)");
+			stmt.execute("INSERT INTO PERSONS VALUES (1113, 'Genry', 'Smirnov', 21)");
+			stmt.execute("INSERT INTO PERSONS VALUES (1141, 'Genry', 'Pavlov', 20)");
+			stmt.execute("INSERT INTO PERSONS VALUES (1411, 'Anton', 'No', 19)");
+			stmt.execute("INSERT INTO PERSONS VALUES (4111, 'Anton', 'Emin', 18)");
+			// ResultSet rs =
+			// stmt.executeQuery("SELECT * FROM PERSONS WHERE FIRST_NAME='Anton' or FIRST_NAME='Jhon'");
 			stmt.close();
 			conn.close();
 		} catch (SQLException se) {
@@ -84,9 +85,11 @@ public class DaoPerson implements DaoInterface<Person> {
 		}
 	}
 
-	public void insert(Person t) {
+	public void insert(Person person) {
 		try {
-			statement.execute("INSERT INTO PERSONS VALUES ('Jerremy', 'Smith', 25)");
+			statement.execute("INSERT INTO PERSONS VALUES (" + person.getID()
+					+ "'" + person.getFirstName() + "', '"
+					+ person.getLastName() + "', " + person.getAge() + ")");
 		} catch (SQLException ex) {
 			throw new RuntimeException("Error connecting to the database", ex);
 		}
@@ -94,7 +97,9 @@ public class DaoPerson implements DaoInterface<Person> {
 
 	public Set<Person> selectByFirstName(String firstName) {
 		try {
-			ResultSet rs = statement.executeQuery("SELECT * FROM PERSONS WHERE FIRST_NAME='" + firstName + "'");
+			ResultSet rs = statement
+					.executeQuery("SELECT * FROM PERSONS WHERE FIRST_NAME='"
+							+ firstName + "'");
 			Set<Person> persons = new HashSet<Person>();
 			while (rs.next()) {
 				persons.add(extractData(rs));
@@ -105,9 +110,11 @@ public class DaoPerson implements DaoInterface<Person> {
 		}
 	}
 
-	public Set selectByLastName(String lastName) {
+	public Set<Person> selectByLastName(String lastName) {
 		try {
-			ResultSet rs = statement.executeQuery("SELECT * FROM PERSONS WHERE LAST_NAME='" + lastName + "'");
+			ResultSet rs = statement
+					.executeQuery("SELECT * FROM PERSONS WHERE LAST_NAME='"
+							+ lastName + "'");
 			Set<Person> persons = new HashSet<Person>();
 			while (rs.next()) {
 				persons.add(extractData(rs));
@@ -118,13 +125,46 @@ public class DaoPerson implements DaoInterface<Person> {
 		}
 	}
 
-	public Set selectByAge(int age) {
-		return null;
-
+	public Set<Person> selectByAge(int age) {
+		try {
+			ResultSet rs = statement
+					.executeQuery("SELECT * FROM PERSONS WHERE AGE='" + age
+							+ "'");
+			Set<Person> persons = new HashSet<Person>();
+			while (rs.next()) {
+				persons.add(extractData(rs));
+			}
+			return persons;
+		} catch (SQLException ex) {
+			throw new RuntimeException("Error connecting to the database", ex);
+		}
 	}
 
-	public Set selectByID(int id) {
-		return null;
+	public Set<Person> selectByID(int id) {
+		try {
+			ResultSet rs = statement
+					.executeQuery("SELECT * FROM PERSONS WHERE ID='" + id + "'");
+			Set<Person> persons = new HashSet<Person>();
+			while (rs.next()) {
+				persons.add(extractData(rs));
+			}
+			return persons;
+		} catch (SQLException ex) {
+			throw new RuntimeException("Error connecting to the database", ex);
+		}
+	}
 
+	public Person delete(Person person) {
+		try {
+			ResultSet rs = statement
+					.executeQuery("DELETE FROM PERSONS WHERE ID="
+							+ person.getID() + " AND FIRST_NAME='"
+							+ person.getFirstName() + "' AND LAST_NAME='"
+							+ person.getLastName() + "' AND AGE="
+							+ person.getAge() + ")");
+			return extractData(rs);
+		} catch (SQLException ex) {
+			throw new RuntimeException("Error connecting to the database", ex);
+		}
 	}
 }

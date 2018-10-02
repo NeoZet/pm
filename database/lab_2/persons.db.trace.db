@@ -1,32 +1,28 @@
-2018-09-25 14:43:36 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLException: Column "ANTON" not found; SQL statement:
-SELECT * FROM PERSONS WHERE FIRST_NAME=Anton [42122-192]
+2018-10-02 04:11:19 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLException: Syntax error in SQL statement "SELECT * FROM CARS WHERE ID=1211)[*]"; SQL statement:
+SELECT * FROM CARS WHERE ID=1211) [42000-192]
+2018-10-02 04:13:37 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLException: Syntax error in SQL statement "SELECT * FROM CARS WHERE ID='1211')[*]"; SQL statement:
+SELECT * FROM CARS WHERE ID='1211') [42000-192]
+2018-10-02 04:18:50 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLException: Syntax error in SQL statement "DELETE FROM CARS WHERE ID='1211' AND MODEL='VAZ-2107' AND COLOR='black')[*]"; SQL statement:
+DELETE FROM CARS WHERE ID='1211' AND MODEL='VAZ-2107' AND COLOR='black') [42000-192]
+2018-10-02 04:19:51 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLException: Method is only allowed for a query. Use execute or executeUpdate instead of executeQuery; SQL statement:
+DELETE FROM CARS WHERE ID='1211' AND MODEL='VAZ-2107' AND COLOR='black' [90002-192]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:345)
 	at org.h2.message.DbException.get(DbException.java:179)
 	at org.h2.message.DbException.get(DbException.java:155)
-	at org.h2.expression.ExpressionColumn.optimize(ExpressionColumn.java:147)
-	at org.h2.expression.Comparison.optimize(Comparison.java:180)
-	at org.h2.command.dml.Select.prepare(Select.java:856)
-	at org.h2.command.Parser.prepareCommand(Parser.java:259)
-	at org.h2.engine.Session.prepareLocal(Session.java:560)
-	at org.h2.engine.Session.prepareCommand(Session.java:501)
-	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1201)
-	at org.h2.jdbc.JdbcStatement.executeQuery(JdbcStatement.java:73)
-	at DaoPerson.selectByFirstName(DaoPerson.java:94)
-	at Main.main(Main.java:14)
-2018-09-25 14:44:17 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLException: Column "ANTON" not found; SQL statement:
-SELECT * FROM PERSONS WHERE FIRST_NAME=Anton [42122-192]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:345)
-	at org.h2.message.DbException.get(DbException.java:179)
-	at org.h2.message.DbException.get(DbException.java:155)
-	at org.h2.expression.ExpressionColumn.optimize(ExpressionColumn.java:147)
-	at org.h2.expression.Comparison.optimize(Comparison.java:180)
-	at org.h2.command.dml.Select.prepare(Select.java:856)
-	at org.h2.command.Parser.prepareCommand(Parser.java:259)
-	at org.h2.engine.Session.prepareLocal(Session.java:560)
-	at org.h2.engine.Session.prepareCommand(Session.java:501)
-	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1201)
-	at org.h2.jdbc.JdbcStatement.executeQuery(JdbcStatement.java:73)
-	at DaoPerson.selectByFirstName(DaoPerson.java:94)
-	at Main.main(Main.java:14)
+	at org.h2.message.DbException.get(DbException.java:144)
+	at org.h2.command.Prepared.query(Prepared.java:212)
+	at org.h2.command.CommandContainer.query(CommandContainer.java:110)
+	at org.h2.command.Command.executeQuery(Command.java:201)
+	at org.h2.jdbc.JdbcStatement.executeQuery(JdbcStatement.java:79)
+	at DaoCar.delete(DaoCar.java:137)
+	at Main.main(Main.java:29)
+2018-10-02 04:35:39 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLException: Syntax error in SQL statement "INSERT INTO CARS VALUES (1211'VAZ-2107'[*], 'white')"; expected "[, ::, *, /, %, +, -, ||, ~, !~, NOT, LIKE, REGEXP, IS, IN, BETWEEN, AND, OR, ,, )"; SQL statement:
+INSERT INTO CARS VALUES (1211'VAZ-2107', 'white') [42001-192]
+2018-10-02 04:36:43 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLException: Syntax error in SQL statement "INSERT INTO CARS VALUES (1211, 'VAZ-2107', 'white'[*]"; expected "[, ::, *, /, %, +, -, ||, ~, !~, NOT, LIKE, REGEXP, IS, IN, BETWEEN, AND, OR, ,, )"; SQL statement:
+INSERT INTO CARS VALUES (1211, 'VAZ-2107', 'white' [42001-192]
