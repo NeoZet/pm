@@ -5,6 +5,7 @@ import java.sql.*;
 public class DaoCar implements DaoInterface<Car> {
 	private Connection connection;
 	private Statement statement;
+	private PreparedStatement preparedStatement = null;
 
 	DaoCar() {
 		connection = ConnectionFactory.getConnection();
@@ -81,8 +82,12 @@ public class DaoCar implements DaoInterface<Car> {
 
 	public void insert(Car car) {
 		try {
-			statement.execute("INSERT INTO CARS VALUES (" + car.getID() + ", '"
-					+ car.getModel() + "', '" + car.getColor() + "')");
+			preparedStatement = connection
+					.prepareStatement("INSERT INTO CARS VALUES (?, ?, ?)");
+			preparedStatement.setInt(1, car.getID());
+			preparedStatement.setString(2, car.getModel());
+			preparedStatement.setString(3, car.getColor());
+			preparedStatement.execute();
 		} catch (SQLException ex) {
 			throw new RuntimeException("Error connecting to the database", ex);
 		}
@@ -90,9 +95,10 @@ public class DaoCar implements DaoInterface<Car> {
 
 	public Set<Car> selectByModel(String model) {
 		try {
-			ResultSet rs = statement
-					.executeQuery("SELECT * FROM CARS WHERE MODEL='" + model
-							+ "'");
+			preparedStatement = connection
+					.prepareStatement("SELECT * FROM CARS WHERE MODEL=?");
+			preparedStatement.setString(1, model);
+			ResultSet rs = preparedStatement.executeQuery();
 			Set<Car> cars = new HashSet<Car>();
 			while (rs.next()) {
 				cars.add(extractData(rs));
@@ -105,9 +111,10 @@ public class DaoCar implements DaoInterface<Car> {
 
 	public Set<Car> selectByColor(String color) {
 		try {
-			ResultSet rs = statement
-					.executeQuery("SELECT * FROM CARS WHERE COLOR='" + color
-							+ "'");
+			preparedStatement = connection
+					.prepareStatement("SELECT * FROM CARS WHERE COLOR=?");
+			preparedStatement.setString(1, color);
+			ResultSet rs = preparedStatement.executeQuery();
 			Set<Car> cars = new HashSet<Car>();
 			while (rs.next()) {
 				cars.add(extractData(rs));
@@ -120,8 +127,10 @@ public class DaoCar implements DaoInterface<Car> {
 
 	public Set<Car> selectByID(int id) {
 		try {
-			ResultSet rs = statement
-					.executeQuery("SELECT * FROM CARS WHERE ID='" + id + "'");
+			preparedStatement = connection
+					.prepareStatement("SELECT * FROM CARS WHERE ID=?");
+			preparedStatement.setInt(1, id);
+			ResultSet rs = preparedStatement.executeQuery();
 			Set<Car> cars = new HashSet<Car>();
 			while (rs.next()) {
 				cars.add(extractData(rs));
@@ -135,9 +144,15 @@ public class DaoCar implements DaoInterface<Car> {
 	public Car delete(Car car) {
 		try {
 			Set<Car> deleted_car = selectByID(car.getID());
-			boolean rs = statement.execute("DELETE FROM CARS WHERE ID='"
-					+ car.getID() + "' AND MODEL='" + car.getModel()
-					+ "' AND COLOR='" + car.getColor() + "'");
+			preparedStatement = connection
+					.prepareStatement("DELETE FROM CARS WHERE ID=?" +
+							" AND MODEL=?" + 
+							" AND COLOR=?");
+			preparedStatement.setInt(1, car.getID());
+			preparedStatement.setString(2, car.getModel());
+			preparedStatement.setString(3, car.getColor());
+			boolean rs = preparedStatement.execute();
+			
 			if (!rs) {
 				return deleted_car.toArray(new Car[1])[0];
 			} else {

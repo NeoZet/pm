@@ -3,7 +3,10 @@ import java.sql.*;
 public class ConnectionFactory {
 	public static final String JDBC_DRIVER = "org.h2.Driver";
 	public static final String DB_URL = "jdbc:h2:file:/home/rem/direct/pm/database/lab_2/persons.db";
-
+//TODO singleton
+	static{
+		
+	}
 	public static Connection getConnection() {
 		try {
 			Class.forName(JDBC_DRIVER).newInstance();

@@ -26,3 +26,43 @@ INSERT INTO CARS VALUES (1211'VAZ-2107', 'white') [42001-192]
 2018-10-02 04:36:43 jdbc[4]: exception
 org.h2.jdbc.JdbcSQLException: Syntax error in SQL statement "INSERT INTO CARS VALUES (1211, 'VAZ-2107', 'white'[*]"; expected "[, ::, *, /, %, +, -, ||, ~, !~, NOT, LIKE, REGEXP, IS, IN, BETWEEN, AND, OR, ,, )"; SQL statement:
 INSERT INTO CARS VALUES (1211, 'VAZ-2107', 'white' [42001-192]
+2018-10-02 11:48:22 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Invalid value "3" for parameter "parameterIndex" [90008-192]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:345)
+	at org.h2.message.DbException.get(DbException.java:179)
+	at org.h2.message.DbException.getInvalidValueException(DbException.java:228)
+	at org.h2.jdbc.JdbcPreparedStatement.setParameter(JdbcPreparedStatement.java:1406)
+	at org.h2.jdbc.JdbcPreparedStatement.setString(JdbcPreparedStatement.java:355)
+	at DaoPerson.insert(DaoPerson.java:94)
+	at Main.main(Main.java:16)
+2018-10-02 11:49:57 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Invalid value "3" for parameter "parameterIndex" [90008-192]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:345)
+	at org.h2.message.DbException.get(DbException.java:179)
+	at org.h2.message.DbException.getInvalidValueException(DbException.java:228)
+	at org.h2.jdbc.JdbcPreparedStatement.setParameter(JdbcPreparedStatement.java:1406)
+	at org.h2.jdbc.JdbcPreparedStatement.setString(JdbcPreparedStatement.java:355)
+	at DaoPerson.insert(DaoPerson.java:94)
+	at Main.main(Main.java:16)
+2018-10-02 11:50:51 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Invalid value "3" for parameter "parameterIndex" [90008-192]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:345)
+	at org.h2.message.DbException.get(DbException.java:179)
+	at org.h2.message.DbException.getInvalidValueException(DbException.java:228)
+	at org.h2.jdbc.JdbcPreparedStatement.setParameter(JdbcPreparedStatement.java:1406)
+	at org.h2.jdbc.JdbcPreparedStatement.setString(JdbcPreparedStatement.java:355)
+	at DaoPerson.insert(DaoPerson.java:94)
+	at Main.main(Main.java:16)
+2018-10-02 11:52:40 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Method is only allowed for a query. Use execute or executeUpdate instead of executeQuery; SQL statement:
+INSERT INTO PERSONS VALUES (?, ?, ?, ?) [90002-192]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:345)
+	at org.h2.message.DbException.get(DbException.java:179)
+	at org.h2.message.DbException.get(DbException.java:155)
+	at org.h2.message.DbException.get(DbException.java:144)
+	at org.h2.command.Prepared.query(Prepared.java:212)
+	at org.h2.command.CommandContainer.query(CommandContainer.java:110)
+	at org.h2.command.Command.executeQuery(Command.java:201)
+	at org.h2.jdbc.JdbcPreparedStatement.executeQuery(JdbcPreparedStatement.java:110)
+	at DaoPerson.insert(DaoPerson.java:99)
+	at Main.main(Main.java:16)

@@ -5,6 +5,7 @@ import java.sql.*;
 public class DaoPerson implements DaoInterface<Person> {
 	private Connection connection;
 	private Statement statement;
+	private PreparedStatement preparedStatement = null;
 
 	DaoPerson() {
 		connection = ConnectionFactory.getConnection();
@@ -87,9 +88,13 @@ public class DaoPerson implements DaoInterface<Person> {
 
 	public void insert(Person person) {
 		try {
-			statement.execute("INSERT INTO PERSONS VALUES (" + person.getID()
-					+ "'" + person.getFirstName() + "', '"
-					+ person.getLastName() + "', " + person.getAge() + ")");
+			preparedStatement = connection
+					.prepareStatement("INSERT INTO PERSONS VALUES (?, ?, ?, ?)");
+			preparedStatement.setInt(1, person.getID());
+			preparedStatement.setString(2, person.getFirstName());
+			preparedStatement.setString(3, person.getLastName());
+			preparedStatement.setInt(4, person.getAge());
+			preparedStatement.execute();
 		} catch (SQLException ex) {
 			throw new RuntimeException("Error connecting to the database", ex);
 		}
@@ -97,9 +102,10 @@ public class DaoPerson implements DaoInterface<Person> {
 
 	public Set<Person> selectByFirstName(String firstName) {
 		try {
-			ResultSet rs = statement
-					.executeQuery("SELECT * FROM PERSONS WHERE FIRST_NAME='"
-							+ firstName + "'");
+			preparedStatement = connection
+					.prepareStatement("SELECT * FROM PERSONS WHERE FIRST_NAME=?");
+			preparedStatement.setString(1, firstName);
+			ResultSet rs = preparedStatement.executeQuery();
 			Set<Person> persons = new HashSet<Person>();
 			while (rs.next()) {
 				persons.add(extractData(rs));
@@ -112,9 +118,10 @@ public class DaoPerson implements DaoInterface<Person> {
 
 	public Set<Person> selectByLastName(String lastName) {
 		try {
-			ResultSet rs = statement
-					.executeQuery("SELECT * FROM PERSONS WHERE LAST_NAME='"
-							+ lastName + "'");
+			preparedStatement = connection
+					.prepareStatement("SELECT * FROM PERSONS WHERE LAST_NAME=?");
+			preparedStatement.setString(1, lastName);
+			ResultSet rs = preparedStatement.executeQuery();
 			Set<Person> persons = new HashSet<Person>();
 			while (rs.next()) {
 				persons.add(extractData(rs));
@@ -127,9 +134,10 @@ public class DaoPerson implements DaoInterface<Person> {
 
 	public Set<Person> selectByAge(int age) {
 		try {
-			ResultSet rs = statement
-					.executeQuery("SELECT * FROM PERSONS WHERE AGE='" + age
-							+ "'");
+			preparedStatement = connection
+					.prepareStatement("SELECT * FROM PERSONS WHERE AGE=?");
+			preparedStatement.setInt(1, age);
+			ResultSet rs = preparedStatement.executeQuery();
 			Set<Person> persons = new HashSet<Person>();
 			while (rs.next()) {
 				persons.add(extractData(rs));
@@ -142,8 +150,10 @@ public class DaoPerson implements DaoInterface<Person> {
 
 	public Set<Person> selectByID(int id) {
 		try {
-			ResultSet rs = statement
-					.executeQuery("SELECT * FROM PERSONS WHERE ID='" + id + "'");
+			preparedStatement = connection
+					.prepareStatement("SELECT * FROM PERSONS WHERE ID=?");
+			preparedStatement.setInt(1, id);
+			ResultSet rs = preparedStatement.executeQuery();
 			Set<Person> persons = new HashSet<Person>();
 			while (rs.next()) {
 				persons.add(extractData(rs));
@@ -156,12 +166,16 @@ public class DaoPerson implements DaoInterface<Person> {
 
 	public Person delete(Person person) {
 		try {
-			ResultSet rs = statement
-					.executeQuery("DELETE FROM PERSONS WHERE ID="
-							+ person.getID() + " AND FIRST_NAME='"
-							+ person.getFirstName() + "' AND LAST_NAME='"
-							+ person.getLastName() + "' AND AGE="
-							+ person.getAge() + ")");
+			preparedStatement = connection
+					.prepareStatement("DELETE FROM PERSONS WHERE ID=? " +
+							"AND FIRST_NAME=? " + 
+							"AND LAST_NAME=? " +
+							"AND AGE=?)");
+			preparedStatement.setInt(1, person.getID());
+			preparedStatement.setString(1, person.getFirstName());
+			preparedStatement.setString(1, person.getLastName());
+			preparedStatement.setInt(1, person.getAge());
+			ResultSet rs = 	preparedStatement.executeQuery();
 			return extractData(rs);
 		} catch (SQLException ex) {
 			throw new RuntimeException("Error connecting to the database", ex);
