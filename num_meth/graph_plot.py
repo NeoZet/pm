@@ -112,7 +112,7 @@ def create_parser():
                         dest='filename',
                         help='file with coordiantes of points',
                         type=str)
-    parser.add_argument('-x', '--x_coord',
+    parser.add_argument('-px', '--point_by_x',
                         help='print point on plot by X coordinate',
                         type=float)
     return parser
@@ -131,8 +131,18 @@ def main():
             return 1
     x_crd = [coord[0] for coord in coords]
     y_crd = [coord[1] for coord in coords]
-    plt.plot(x_crd, y_crd, label = 'Pit plot')        
+    plt.plot(x_crd, y_crd, label='Pit plot', linewidth=2)        
 
+    x_coord = None
+    if args.point_by_x and args.point_by_x >= min(x_crd) and args.point_by_x <= max(x_crd):
+        x_coord = args.point_by_x
+        y = getY(args.point_by_x, x_crd, y_crd)
+        print("\nPit:\n-----------\nX:{0}\nY:{1}\n============".format(x_coord, y))
+        plt.plot(args.point_by_x, y, marker='o', markersize=5, color='red')
+        plt.annotate("[{0}, {1}]".format(args.point_by_x, y), (args.point_by_x, y))
+    elif args.point_by_x:
+        print("Invalid argument for --x_coord", file=sys.stderr)
+        
     if args.command == 'polynom':
         if not args.x_list:
             print('WARNING! Incorrect points list')
@@ -140,29 +150,44 @@ def main():
         else:
             x_list = [float(x) for x in args.x_list.split(' ')]
             y_list = [getY(x, x_crd, y_crd) for x in x_list]
-            print(getY(13, x_crd, y_crd))
-            
-        if args.interpolation_polynom == 'Lagrange':     
-            lagr_y = [Lagrange_interpolation_polynomial(x, x_list, y_list) for x in x_crd]
-            plt.plot(x_crd, lagr_y, linewidth=2, label='Lagrange interpolation polynomial')
+
+        polynom_y = []
+        if args.interpolation_polynom == 'Lagrange':
+            plt.title("Lagrange interpolation polynomial")
+            polynom_y = [Lagrange_interpolation_polynomial(x, x_list, y_list) for x in x_crd]
+            y = getY(x_coord, x_crd, polynom_y)
+            print("Lagrange:\n-----------\nX:{0}\nY:{1}\n============".format(x_coord, y))
+            plt.plot(x_crd, polynom_y, linewidth=2, label='Lagrange polynomial')
         elif args.interpolation_polynom == 'Newton':
-            newt_y = [Newton_interpolation_polynomial(x, x_list, y_list) for x in x_crd]
-            plt.plot(x_crd, newt_y, linewidth=2, label='Newton interpolation polynomial')
+            plt.title("Newton interpolation polynomial")
+            polynom_y = [Newton_interpolation_polynomial(x, x_list, y_list) for x in x_crd]
+            y = getY(x_coord, x_crd, polynom_y)
+            print("Newton:\n-----------\nX:{0}\nY:{1}\n============".format(x_coord, y))
+            plt.plot(x_crd, polynom_y, linewidth=2, label='Newton polynomial')
         elif args.interpolation_polynom is not None:
-            print(y_list)
-            lagr_y = [Lagrange_interpolation_polynomial(x, x_list, y_list) for x in x_crd]            
-            newt_y = [Newton_interpolation_polynomial(x, x_list, y_list) for x in x_crd]
-            plt.plot(x_crd, lagr_y, linewidth=3, color='orange', label='Lagrange interpolation polynomial')        
-            plt.plot(x_crd, newt_y, linewidth=1, color='black', label='Newton interpolation polynomial')
+            plt.title("Lagrange & Newton interpolation polynomials")
 
-    if args.x_coord and args.x_coord >= min(x_crd) and args.x_coord <= max(x_crd):
-        y = getY(args.x_coord, x_crd, y_crd) 
-        plt.plot(args.x_coord, y, marker='o', markersize=4)
-        plt.annotate("[{0}, {1}]".format(args.x_coord, y), (args.x_coord, y))
-    elif args.x_coord:
-        print("Invalid argument", file=sys.stderr)
+            polynom_y = [Lagrange_interpolation_polynomial(x, x_list, y_list) for x in x_crd]
+            y = getY(x_coord, x_crd, polynom_y)
+            print("Lagrange:\n-----------\nX:{0}\nY:{1}\n============".format(x_coord, y))
+            plt.plot(x_crd, polynom_y, linewidth=3, color='orange', label='Lagrange polynomial')
+            
+            polynom_y = [Newton_interpolation_polynomial(x, x_list, y_list) for x in x_crd]
+            y = getY(x_coord, x_crd, polynom_y)
+            print("Newton:\n-----------\nX:{0}\nY:{1}\n============".format(x_coord, y))
+            plt.plot(x_crd, polynom_y, linewidth=1, color='black', label='Newton polynomial')
 
-    plt.ylim(min(y_crd) - 20, max(y_crd) + 20)  
+        if x_coord is not None:
+            y = getY(x_coord, x_crd, polynom_y) 
+            plt.plot(x_coord, y, marker='o', markersize=4, color='green')
+            plt.annotate("[{0}, {1}]".format(float('{:.5f}'.format(x_coord)),
+                                             float('{:.5f}'.format(y))), (x_coord, y))
+            
+    
+
+    #plt.ylim(min(y_crd) - 20, max(y_crd) + 20)
+    plt.xlabel('X, [mm]')
+    plt.ylabel('Y, [mm]')
     plt.legend(loc='best')
     plt.grid(True)
 
