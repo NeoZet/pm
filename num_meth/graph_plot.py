@@ -115,7 +115,8 @@ def cubic_spline(x_list, y_list, nodes_number):
             b = x_spline_points[j] - x_spline_points[m]
             r = 2 * (a + b) - b * c[j]
             c.append(a / r)
-            k.append((3 * ((y_spline_points[i] - y_spline_points[j]) / a - (y_spline_points[j] - y_spline_points[m]) / b) - (b * k[j]) / r))
+            k.append((3 *  ((y_spline_points[i] - y_spline_points[j]) / a -
+                            (y_spline_points[j] - y_spline_points[m]) / b) - (b * k[j]) / r))
         c[nodes_num-1] = k[nodes_num-1]
         for i in reversed(range(1, nodes_num-1)):
             c[i] = k[i] - c[i] * c[i+1]
