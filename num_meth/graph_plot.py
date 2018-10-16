@@ -247,7 +247,6 @@ def main():
         else:
             spline = cubic_spline(x_crd, y_crd, args.nodes_number)
             plt.plot(spline["x"], spline["y"], label='Spline', linewidth=2)
-
     plt.xlabel('X, [mm]')
     plt.ylabel('Y, [mm]')
     plt.legend(loc='best')
