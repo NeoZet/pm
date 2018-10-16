@@ -99,46 +99,51 @@ def Newton_interpolation_polynomial(x, x_list, y_list):
 
     
 def cubic_spline(x_list, y_list, nodes_number):
-    interval_len = x_list_g[-1] // (nodes_number - 1)
-    x_spline_points = [x_list_g[0] + (interval_len * i) for i in range(nodes_number)]
-    y_spline_points = [getY(x_spline_points[i], x_list_g, y_list_g) for i in range(nodes_number)]            
+    interval_len = x_list[-1] / (nodes_number - 1)
+    x_spline_points = [float('{:.10f}'.format(x_list[0] + (interval_len * i))) for i in range(nodes_number)]
+    y_spline_points = [getY(x_spline_points[i], x_list, y_list) for i in range(nodes_number)]            
 
     def _c_coeff(nodes_num, x_spline_points, y_spline_points):
         k = []
         k.append(0)
         c = []
         c.append(0)
-        for i in range(1, n):
+        for i in range(1, nodes_num):
             j = i - 1
             m = j - 1
             a = x_spline_points[i] - x_spline_points[j]
             b = x_spline_points[j] - x_spline_points[m]
             r = 2 * (a + b) - b * c[j]
-            c[i] = a / r
-            k[i] = (3 * ((y_spline_points[i] - y_spline_points[j]) / a - (y_spline_points[j] - y_spline_points[m]) / b) - (b * k[j]) / r)
-
-        c[n-1]=k[n-1]
-        for i in reversed(range(1, n-1)):
-            c[i]=k[i]-c[i]*c[i+1]
+            c.append(a / r)
+            k.append((3 * ((y_spline_points[i] - y_spline_points[j]) / a - (y_spline_points[j] - y_spline_points[m]) / b) - (b * k[j]) / r))
+        c[nodes_num-1] = k[nodes_num-1]
+        for i in reversed(range(1, nodes_num-1)):
+            c[i] = k[i] - c[i] * c[i+1]
         return c
- 
-def Spl(n, x,f,c, x1, p,p1,p2):
-    i=0
-    while (x1>x[i]) and (i!=n-2):
-        i=i+1
-    j=i-1
-    a=f[j]
-    b=x[j]
-    q=x[i]-b
-    r=x1-b
-    p=c[i]
-    d=c[i+1]
-    b=(f[i]-a)/q - (d+2*p)*q/3.0
-    d=(d-p)/q*r
-    p1=b+r*(2*p+d)
-    p2=2*(p+d)
-    p=a+r*(b+r*(p+d/3.0))
-    return p
+
+    def _spline_component_y(nodes_num, x_list, y_list, c_coef, x):
+        i = 0
+        p = 0
+        while (x > x_list[i]) and (i != nodes_num - 2):
+            i = i + 1
+        j = i - 1
+        a = y_list[j]
+        b = x_list[j]
+        q = x_list[i] - b
+        r = x - b
+        p = c_coef[i]
+        d = c_coef[i+1]
+        b = (y_list[i] - a) / q - (d + 2*p) * q / 3.0
+        d = (d - p) / q * r        
+        p = a + r * (b + r * (p + d / 3.0))
+        return p
+    
+    c = _c_coeff(nodes_number, x_spline_points, y_spline_points)
+
+    spline_y = [_spline_component_y(nodes_number, x_spline_points, y_spline_points, c, x) for x in x_spline_points]
+    spline_y[-1] = y_list[-1]
+    spline = {"x" : x_spline_points, "y" : spline_y}
+    return spline
 
 
 def create_parser():
@@ -155,6 +160,12 @@ def create_parser():
                                 dest='x_list',
                                 help='list of x values (For example "x_1 x_2 x_3")',
                                 type=str)
+    
+    parser_polynom = subparsers.add_parser('spline', help='iterpolation via cubic spline')
+    parser_polynom.add_argument('-n', '--nodes_number',
+                                dest='nodes_number',
+                                help='number of nodes of spline',
+                                type=int)
     
     parser.add_argument('-f', '--filename',
                         dest='filename',
@@ -178,29 +189,8 @@ def main():
             return 1
         x_crd = [coord[0] for coord in coords]
         y_crd = [coord[1] for coord in coords]
-    #cubic_spline(x_crd, y_crd, 100)
-    nodes_number = 287
-    interval_len = x_crd[-1] / (nodes_number - 1)
-    # print(float('{:.10f}'.format(interval_len)))    
-    x_spl = [float('{:.10f}'.format(x_crd[0] + (interval_len * i))) for i in range(nodes_number)]
 
-    y_spl = [getY(x_spl[i], x_crd, y_crd) for i in range(nodes_number)]
-
-    c = Coeff(nodes_number, x_spl, y_spl)
-    print(c)
-    p = 0
-    p1 = 0
-    p2 = 0
-    spline = [Spl(nodes_number, x_spl, y_spl, c, x, p, p1, p2) for x in x_spl]
-    spline[-1] = y_crd[-1]
-    # print(Interpolate(, x_spl, y_spl, c))
-    # spline = [Interpolate(x, x_spl, y_spl, c) for x in x_crd]
-
-    print(x_spl)
-    print(y_spl)
-    print(spline)
     plt.plot(x_crd, y_crd, label='Pit plot', linewidth=3)                
-    plt.plot(x_spl, spline, label='Spline', linewidth=2)
     x_coord = None
     if args.point_by_x and args.point_by_x >= min(x_crd) and args.point_by_x <= max(x_crd):
         x_coord = args.point_by_x
@@ -251,9 +241,13 @@ def main():
             plt.annotate("[{0}, {1}]".format(float('{:.5f}'.format(x_coord)),
                                              float('{:.5f}'.format(y))), (x_coord, y))
             
-    
+    elif args.command == 'spline':
+        if not args.nodes_number:
+            print('WARNING! Incorrect number of nodes')
+        else:
+            spline = cubic_spline(x_crd, y_crd, args.nodes_number)
+            plt.plot(spline["x"], spline["y"], label='Spline', linewidth=2)
 
-    #plt.ylim(min(y_crd) - 20, max(y_crd) + 20)
     plt.xlabel('X, [mm]')
     plt.ylabel('Y, [mm]')
     plt.legend(loc='best')
