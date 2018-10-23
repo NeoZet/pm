@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>NEW PAGE</title>
+        <input type="text" id="l_name" name="Last name">
+        <script type="text/javascript">
+            function readServerString(url, callback) {
+                var req = new XMLHttpRequest();
+                req.onreadystatechange = function() {
+                    if(req.readyState === 4) {
+                        if(req.status === 200) {
+                            callback(undefined, req.responseText);
+                        }
+                    }   
+                }
+                req.open("POST", url, true);
+                req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                req.send("INF");
+            }
+
+            function call1() {
+                readServerString("INF", function(err, res) {
+                    getElementById('l_name').innerHTML = res;
+                });
+            }
+        </script>
+        <a href="javascript:call1()">:::::CALL_1:::::   </a>
+    </head>
+</html>

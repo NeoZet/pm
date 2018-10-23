@@ -49,7 +49,7 @@ var html_print = function (err, rows) {
 	    response.write('<tr>\n'+
 			   '<td style="color: black">\n'+ rows[i].LAST_NAME + ' ' + rows[i].FIRST_NAME + '</td>\n'+
 			   '<td id="str" align="center">\n' + rows[i].AGE + '</td>\n'+
-			   '<td id="numb1" align="center">\n' + rows[i].AGE + '</td>\n'+
+			   '<td id="numb1" align="center">\n' + rows[i].ID + '</td>\n'+
 			   '</tr>\n');
 	}
 	response.end('</table>\n'+
@@ -69,5 +69,6 @@ function closeDb() {
 function run() {
     createDb();
     return db;
-    //readAllRows();
-}
+}	
+
+module.exports.run = run;
