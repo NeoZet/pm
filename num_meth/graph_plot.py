@@ -137,6 +137,62 @@ def cubic_spline(x_list, y_list, nodes_number):
     return spline
 
 
+def approximation(x_list, y_list, polynom_power):
+    def _gauss_sol(M,c):
+        zero_array = lambda n:list(map(lambda a: 0, range(0,n)))
+        def __choose(x):
+            i = 0
+            while (x[i]==0)and(i<len(x)):
+                i+=1
+            if i<len(x):
+                return i
+            else:
+                return -1
+
+        if (len(M) != len(M[0])) or (len(M) != len(c)):
+            return None
+        n = len(M)
+        indices = zero_array(n)
+        for i in range(0, n):
+            k = __choose(M[i])
+            for j in filter(lambda a,b = i: a != b, range(0,n)):
+                c[j] -= (c[i]*M[j][k]/M[i][k])
+                tmp = [(M[i][t] / M[i][k] * M[j][k]) for t in range(n)]
+                M[j] = [int((M[j][t] - tmp[t])) for t in range(n)]
+            indices[i] = k
+        x = zero_array(n)
+        for i in range(0,n):
+            x[i]=(c[i] / M[i][indices[i]])
+        return x
+
+    power_x = []
+    meas_number = len(x_list)
+    for k in range(2 * polynom_power + 1):
+        sum_xi = 0
+        for i in range(meas_number):
+            sum_xi += float(x_list[i] ** k)
+        power_x.append(sum_xi)
+    sumx = []
+    for i in range(polynom_power + 1):
+        sumx.append([])
+        for j in range(polynom_power + 1):
+            sumx[i].append(power_x[i + j])            
+    praw = []
+    for l in range(polynom_power + 1):
+        yi_xi = 0
+        for i in range(meas_number):
+            yi_xi += y_list[i] * (x_list[i] ** l)
+        praw.append(yi_xi)
+    a_coefs = _gauss_sol(sumx, praw)
+    rms_deviation = np.sqrt(((1 / (meas_number - polynom_power -1)) +
+                             sum(((y_list[i] -
+                                   sum((a_coefs[m] * (x_list[i] ** m)) for m in range(polynom_power + 1))) ** 2)
+                            for i in range(meas_number))))
+    print("Deviation ::", rms_deviation)
+    return [sum(a_coefs[m] * (x ** m) for m in range(polynom_power + 1)) for x in x_list]
+    
+    
+
 def create_parser():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest='command')
@@ -152,11 +208,17 @@ def create_parser():
                                 help='list of x values (For example "x_1 x_2 x_3")',
                                 type=str)
     
-    parser_polynom = subparsers.add_parser('spline', help='iterpolation via cubic spline')
-    parser_polynom.add_argument('-n', '--nodes_number',
+    parser_spline = subparsers.add_parser('spline', help='iterpolation via cubic spline')
+    parser_spline.add_argument('-n', '--nodes_number',
                                 dest='nodes_number',
                                 help='number of nodes of spline',
                                 type=int)
+
+    parser_approx = subparsers.add_parser('approx', help='approximation via polynomial')
+    parser_approx.add_argument('-p', '--polynom_power',
+                               dest='polynomial_power',
+                               help='power of approximation polynomial',
+                               type=int)
     
     parser.add_argument('-f', '--filename',
                         dest='filename',
@@ -181,7 +243,8 @@ def main():
     x_crd = [coord[0] for coord in coords]
     y_crd = [coord[1] for coord in coords]
 
-    plt.plot(x_crd, y_crd, label='Pit plot', linewidth=3)                
+    plt.plot(x_crd, y_crd, label='Pit plot', linewidth=3)
+    
     x_coord = None
     if args.point_by_x and args.point_by_x >= min(x_crd) and args.point_by_x <= max(x_crd):
         x_coord = args.point_by_x
@@ -224,7 +287,13 @@ def main():
         else:
             spline = cubic_spline(x_crd, y_crd, args.nodes_number)
             plt.plot(spline["x"], spline["y"], label='Spline', linewidth=2)
-            
+    elif args.command == 'approx':
+        if not args.polynomial_power:
+            print('WARNING! Incorrect polynomial power')
+        else:
+            y_appr = approximation(x_crd, y_crd, args.polynomial_power)
+            plt.plot(x_crd, y_appr, label='Approximation polynomial', linewidth=2)    
+    
     plt.xlabel('X, [mm]')
     plt.ylabel('Y, [mm]')
     plt.legend(loc='best')
