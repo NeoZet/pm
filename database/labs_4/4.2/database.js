@@ -6,9 +6,17 @@ function createDb() {
     db = new sqlite3.Database('persons.db', createTable);
 }
 
+function openDb() {
+	db = new sqlite3.Database('./persons.db', sqlite3.OPEN_READWRITE, (err) => {
+  		if (err) {
+    		console.error(err.message);
+  		}
+  		console.log('Connected to the PERSONS database.');
+	});
+}
 
 function createTable() {
-    db.run("CREATE TABLE IF NOT EXISTS PERSONS (ID INTEGER, FIRST_NAME TEXT, LAST_NAME TEXT, AGE INTEGER)", setRows);
+    db.run("CREATE TABLE IF NOT EXISTS persons(ID INTEGER, FIRST_NAME TEXT, LAST_NAME TEXT, AGE INTEGER)", setRows);
 }
 
 function setRows() {
@@ -29,7 +37,7 @@ function setRows() {
 
 var html_print = function (err, rows) {
     if(err) {
-	console.log("ERROR");
+		console.log("ERROR");
     }
     http.createServer(function(request, response) {
 	response.writeHead(200, {'Content-Type':'text/html'});
@@ -55,10 +63,11 @@ var html_print = function (err, rows) {
 	response.end('</table>\n'+
 		     '</body>\n'+
 		     '</html>\n');
-    }).listen(3000);
+    }).listen(3001);
 }
 
 function readAllRows() {
+	console.log(db);
     db.all("SELECT * FROM PERSONS", html_print);
 }
 
@@ -67,7 +76,12 @@ function closeDb() {
 }
 
 function run() {
-    createDb();
+	console.log("RUN");
+	openDb();
+	// createDb();
+	// console.log(db);
+	// 
+	// readAllRows();
     return db;
 }	
 
