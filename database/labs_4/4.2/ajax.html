@@ -43,21 +43,25 @@
                 readServerString("fname&"+document.forms["first_name"].elements["f_name"].value, function(err, res) {
                     document.getElementById("call_res").innerHTML = res;
                 });
+                document.forms["first_name"].reset();
             }
             function searchByLastName() {
                 readServerString("lname&"+document.forms["last_name"].elements["l_name"].value, function(err, res) {
                     document.getElementById("call_res").innerHTML = res;
                 });
+                document.forms["last_name"].reset();
             }
             function searchByAge() {
                 readServerString("age&"+document.forms["age"].elements["age"].value, function(err, res) {
                     document.getElementById("call_res").innerHTML = res;
                 });
+                document.forms["age"].reset();
             }
             function searchByID() {
                 readServerString("id&"+document.forms["ID"].elements["id"].value, function(err, res) {
                     document.getElementById("call_res").innerHTML = res;
                 });
+                document.forms["ID"].reset();
             }
         </script>
         <span id="call_res"></span> 

@@ -11,7 +11,6 @@ function openDb() {
   		if (err) {
     		console.error(err.message);
   		}
-  		console.log('Connected to the PERSONS database.');
 	});
 }
 
@@ -76,12 +75,7 @@ function closeDb() {
 }
 
 function run() {
-	console.log("RUN");
 	openDb();
-	// createDb();
-	// console.log(db);
-	// 
-	// readAllRows();
     return db;
 }	
 

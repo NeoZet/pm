@@ -2,9 +2,10 @@ var http = require('http')
 var fs = require('fs')
 var db = require('./database.js');
 
-http.createServer(function(req, res) {
+console.log("Start server");
+
+http.createServer(function(req, res) {	
 	request = req.url.split('&');
-	console.log(request);
 	res.writeHead(200, {'Content-Type':'text/html'});
 	var database = db.run();		
 	var rules_callbacks = {
@@ -33,22 +34,6 @@ http.createServer(function(req, res) {
 				res.end();
 			});
 	}
-	// switch() {
-	// 	case '/':
-			
-	// 		break;
-	// 	case '/fname':
-	// 		findInDB(database, request[1], findInFirst)
-	// 		.then(resolve => {
-	// 			let http_str = html_format(resolve);
-	// 			return http_str;
-	// 		})
-	// 		.then(http_str => {
-	// 			res.write(http_str);
-	// 			res.end();
-	// 		});						
-	// 		break;	
-	// }
 }).listen(3000);
 
 
