@@ -191,7 +191,60 @@ def approximation(x_list, y_list, polynom_power):
     print("Deviation ::", rms_deviation)
     return [sum(a_coefs[m] * (x ** m) for m in range(polynom_power + 1)) for x in x_list]
     
+
+def integration(method, lower_limit, upper_limit, x_list, y_list):
     
+    def _left_rectangle(x_list, y_list):
+        integral = 0
+        for i in range(len(x_list)-1):
+            integral += y_list[i] * (x_list[i+1] - x_list[i])
+        return integral
+        
+    def _right_rectangle(x_list, y_list):
+        integral = 0
+        for i in range(1, len(x_list)):
+            integral += y_list[i] * (x_list[i] - x_list[i-1])
+        return integral
+    
+    def _midpoint_rectangle(x_list, y_list):
+        integral = 0        
+        for i in range(len(x_list) - 1):
+            y = getY((x_list[i] + x_list[i+1]) / 2, x_list, y_list)
+            integral += y * (x_list[i+1] - x_list[i])
+        return integral
+    
+    def _trapezoidal_rule(x_list, y_list):
+        integral = 0
+        for i in range(len(x_list) - 1):
+            integral += (y_list[i] + y_list[i+1]) / 2 * (x_list[i+1] - x_list[i])
+        return integral
+    
+    def _simpson_rule(x_list, y_list):
+        sum_by_even_indices = 0
+        sum_by_odd_indices = 0
+        x_l = [i for i in range(int(x_list[0]), int(x_list[-1] + 1))]     
+        y_list = [getY(x, x_list, y_list) for x in x_l]
+        x_list = x_l
+        num = len(x_list) // 2
+        h = (x_list[-1] - x_list[0]) / (2 * num)
+        sum_by_even_indices = sum([getY(x_list[2 * i], x_list, y_list) for i in range(1, num)])
+        sum_by_odd_indices = sum([getY(x_list[2 * i - 1], x_list, y_list) for i in range(1, num + 1)])
+        integral = h/3 * (y_list[0] + y_list[-1] + 2 * sum_by_even_indices + 4 * sum_by_odd_indices)        
+        return integral
+
+    methods = {
+        'left_rectangle' : _left_rectangle,
+        'right_rectangle' : _right_rectangle,
+        'midpoint_rectangle' : _midpoint_rectangle,
+        'trapezoidal_rule' : _trapezoidal_rule,
+        'simpson_rule' : _simpson_rule
+    }
+
+    x_integration_interval = x_list[x_list.index(lower_limit) : (x_list.index(upper_limit) + 1)]
+    y_integration_interval = [getY(x, x_list, y_list) for x in x_integration_interval]
+
+    return methods.get(method)(x_integration_interval, y_integration_interval)
+
 
 def create_parser():
     parser = argparse.ArgumentParser()
@@ -219,6 +272,25 @@ def create_parser():
                                dest='polynomial_power',
                                help='power of approximation polynomial',
                                type=int)
+
+    parser_integration = subparsers.add_parser('integration', help='numeric integration')
+    parser_polynom.add_argument('-m', '--method',
+                                dest='integration_method',
+                                help='''numeric integration method:
+                                                                    | left_rectangle
+                                                                    | right_rectangle
+                                                                    | midpoint
+                                                                    | trapezoidal
+                                                                    | simpson''',
+                                default='midpoint')
+
+    
+    #     print(integration('left_rectangle', 40, 90, x_crd, y_crd))
+    # print(integration('right_rectangle', 40, 90, x_crd, y_crd))
+    # print(integration('midpoint_rectangle', 40, 90, x_crd, y_crd))
+    # print(integration('trapezoidal_rule', 40, 90, x_crd, y_crd))
+    # print(integration('simpson_rule', 40, 90, x_crd, y_crd))
+
     
     parser.add_argument('-f', '--filename',
                         dest='filename',
