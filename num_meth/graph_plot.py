@@ -235,15 +235,16 @@ def integration(method, lower_limit, upper_limit, x_list, y_list):
     methods = {
         'left_rectangle' : _left_rectangle,
         'right_rectangle' : _right_rectangle,
-        'midpoint_rectangle' : _midpoint_rectangle,
-        'trapezoidal_rule' : _trapezoidal_rule,
-        'simpson_rule' : _simpson_rule
+        'midpoint' : _midpoint_rectangle,
+        'trapezoidal' : _trapezoidal_rule,
+        'simpson' : _simpson_rule
     }
 
     x_integration_interval = x_list[x_list.index(lower_limit) : (x_list.index(upper_limit) + 1)]
     y_integration_interval = [getY(x, x_list, y_list) for x in x_integration_interval]
 
     return methods.get(method)(x_integration_interval, y_integration_interval)
+
 
 
 def create_parser():
@@ -274,23 +275,29 @@ def create_parser():
                                type=int)
 
     parser_integration = subparsers.add_parser('integration', help='numeric integration')
-    parser_polynom.add_argument('-m', '--method',
+    parser_integration.add_argument('-m', '--method',
                                 dest='integration_method',
                                 help='''numeric integration method:
-                                                                    | left_rectangle
-                                                                    | right_rectangle
-                                                                    | midpoint
-                                                                    | trapezoidal
-                                                                    | simpson''',
+                                        | left_rectangle
+                                        | right_rectangle
+                                        | midpoint
+                                        | trapezoidal
+                                        | simpson''',
                                 default='midpoint')
-
     
-    #     print(integration('left_rectangle', 40, 90, x_crd, y_crd))
-    # print(integration('right_rectangle', 40, 90, x_crd, y_crd))
-    # print(integration('midpoint_rectangle', 40, 90, x_crd, y_crd))
-    # print(integration('trapezoidal_rule', 40, 90, x_crd, y_crd))
-    # print(integration('simpson_rule', 40, 90, x_crd, y_crd))
-
+    parser_integration.add_argument('-l', '--lower-limit',
+                               dest='lower_integration_limit',
+                               help='lower limit of integration',
+                               type=int)
+    
+    parser_integration.add_argument('-u', '--upper-limit',
+                               dest='upper_integration_limit',
+                               help='upper limit of integration',
+                               type=int)
+    parser_integration.add_argument('-a', '--all-methods',
+                                    dest='all_methods',
+                                    action="store_true",
+                                    help='calculate integral for all methods',)
     
     parser.add_argument('-f', '--filename',
                         dest='filename',
@@ -302,6 +309,7 @@ def create_parser():
     return parser
 
 def main():
+    plot_exists = False
     parser = create_parser()
     args = parser.parse_args()
 
@@ -324,10 +332,12 @@ def main():
         print("\nPit:\n-----------\nX:{0}\nY:{1}\n============".format(x_coord, y))
         plt.plot(args.point_by_x, y, marker='o', markersize=5, color='red')
         plt.annotate("[{0}, {1}]".format(args.point_by_x, y), (args.point_by_x, y))
+        plot_exists = True
     elif args.point_by_x:
         print("Invalid argument for --x_coord", file=sys.stderr)
         
     if args.command == 'polynom':
+        plot_exists = True
         if not args.x_list:
             print('WARNING! Incorrect points list')
             args.interpolation_polynom = False
@@ -354,23 +364,53 @@ def main():
                                              float('{:.5f}'.format(y_coord))), (x_coord, y_coord))
             
     elif args.command == 'spline':
+        plot_exists = True
         if not args.nodes_number:
             print('WARNING! Incorrect number of nodes')
         else:
             spline = cubic_spline(x_crd, y_crd, args.nodes_number)
             plt.plot(spline["x"], spline["y"], label='Spline', linewidth=2)
+            
     elif args.command == 'approx':
+        plot_exists = True
         if not args.polynomial_power:
             print('WARNING! Incorrect polynomial power')
         else:
             y_appr = approximation(x_crd, y_crd, args.polynomial_power)
-            plt.plot(x_crd, y_appr, label='Approximation polynomial', linewidth=2)    
+            plt.plot(x_crd, y_appr, label='Approximation polynomial', linewidth=2)
+
+    elif args.command == 'integration':        
+        if not args.lower_integration_limit or not args.upper_integration_limit:
+            print('WARNING! Incorrect integration limits')
+        elif args.all_methods:
+            methods = [
+                'left_rectangle',
+                'right_rectangle',
+                'midpoint',
+                'trapezoidal',
+                'simpson']
+            integrals = [integration(method,
+                                     args.lower_integration_limit,
+                                     args.upper_integration_limit,
+                                     x_crd,
+                                     y_crd) for method in methods]
+            [print('{0} : {1}'.format(methods[i], integrals[i])) for i in range(len(methods))]
+                
+        else:
+            integral = integration(args.integration_method,
+                                   args.lower_integration_limit,
+                                   args.upper_integration_limit,
+                                   x_crd,
+                                   y_crd)
+            print(integral)
+            
     
     plt.xlabel('X, [mm]')
     plt.ylabel('Y, [mm]')
     plt.legend(loc='best')
     plt.grid(True)
+    if plot_exists:
+        plt.show()
 
 if __name__ == "__main__":
     main()
-    plt.show()
