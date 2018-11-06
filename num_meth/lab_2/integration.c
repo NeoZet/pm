@@ -38,7 +38,7 @@ static float80_t integral_by_simpson(float80_t *y_list, int y_list_size, float80
 
 int main()
 {
-	void start(int epsilon)
+	void start(float80_t epsilon)
 	{
 		float80_t accuracy_trapezoidal = 0;
 		float80_t integral_trapezoidal = trapezoidal_rule(integrate_function, LOW_LIMIT, UP_LIMIT, epsilon, &accuracy_trapezoidal);	
@@ -46,8 +46,8 @@ int main()
 		float80_t accuracy_simpson = 0;
 		float80_t integral_simpson = simpson_rule(integrate_function, LOW_LIMIT, UP_LIMIT, epsilon, &accuracy_simpson);
 	
-		printf("trapezoidal: %.15Lf =::= epsilon: %d =::= accuracy: %.15Lf\n", integral_trapezoidal, epsilon, accuracy_trapezoidal);
-		printf("simpson    : %.15Lf =::= epsilon: %d =::= accuracy: %.15Lf\n", integral_simpson, epsilon, accuracy_simpson);
+		printf("trapezoidal: %.15Lf =::= epsilon: %Lf =::= accuracy: %.15Lf\n", integral_trapezoidal, epsilon, accuracy_trapezoidal);
+		printf("simpson    : %.15Lf =::= epsilon: %Lf =::= accuracy: %.15Lf\n", integral_simpson, epsilon, accuracy_simpson);
 	}
 
 	start(EPS_4);
