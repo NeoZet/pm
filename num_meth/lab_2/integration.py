@@ -31,7 +31,7 @@ def simpson_rule(integrate_function, lower_limit, upper_limit, epsilon):
                       4 * sum([y_list[2 * i - 1] for i in range(1, num // 2 + 1)]))
 
     def _check_accuracy(epsilon, step):
-        integral = _integral(step)
+        integral = _integral(step)        
         accuracy = abs(_integral(step / 2) - integral) / 15
         if accuracy < epsilon:
             return [integral, accuracy]
