@@ -9,7 +9,7 @@
 #define MAX_ARRAY_SIZE 1024 * 1024
 
 #define LOW_LIMIT 0
-#define UP_LIMIT  4
+#define UP_LIMIT 4 
 
 enum INTEGRATION_RULES {
 	TRAPEZOIDAL = 0,
@@ -68,7 +68,6 @@ float80_t simpson_rule(func_ptr integrate_function, float80_t lower_limit, float
 	return integrate(integrate_function, lower_limit, upper_limit, eps, accuracy);
 }
 
-
 static float80_t integrate_function(float80_t x)
 {
 	return 1.0/(1 + pow(x, 1.0/2));
@@ -108,8 +107,6 @@ static float80_t integral_calculation(func_ptr integrate_function, float80_t ste
 			y_list[arr_iter] = integrate_function(x_value);				
 		}
 	float80_t h = (x_list[arr_iter-1] - x_list[0]) / arr_iter;
-        float80_t y_list_sum = 0;
-	uint32_t i;
 	
 	switch (RULE) {
 	case TRAPEZOIDAL:
@@ -161,10 +158,10 @@ static float80_t integral_by_trapezoidal(float80_t *y_list, int y_list_size, flo
 	}								
 	return h/2 * (y_list[0] +					
 		      2 * y_list_sum +					
-		      y_list[y_list_size]);					
+		      y_list[y_list_size-1]);					
 }
 
-static float80_t integral_by_simpson(float80_t *y_list, int  y_list_size, float80_t h)
+static float80_t integral_by_simpson(float80_t *y_list, int y_list_size, float80_t h)
 {
 	float80_t sum_by_odd_index = 0;
 	float80_t sum_by_even_index = 0;
@@ -176,7 +173,7 @@ static float80_t integral_by_simpson(float80_t *y_list, int  y_list_size, float8
 		sum_by_even_index += y_list[2 * i - 1];
 	}
         return h/3 * (y_list[0] +
-                      y_list[y_list_size] +
+                      y_list[y_list_size-1] +
                       2 * sum_by_odd_index +
                       4 * sum_by_even_index);
 }
