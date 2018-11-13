@@ -3,7 +3,7 @@
       real*8, parameter  :: lower_limit=0, upper_limit=4
       real*8             :: start_step=1
       real*8             :: eps_4 = 0.0001, eps_5 = 10**(-5)
-      integer, parameter :: MAX_ARR_SIZE = 1024
+      integer, parameter :: MAX_ARR_SIZE = 1024 * 1024 * 8
       end module constants
      
       
@@ -18,15 +18,15 @@
       use constants
       real*8, intent(in) :: step
       real*8             :: integrate_function
-      real*8             :: x_array(MAX_ARR_SIZE)
-      real*8             :: y_array(MAX_ARR_SIZE)
+      real*8             :: x_array(0:MAX_ARR_SIZE)
+      real*8             :: y_array(0:MAX_ARR_SIZE)
       real*8             :: value
       integer            :: iter, arr_size
       
       iter  = 0
       value = lower_limit
       
-      do while (value <= upper_limit .and. iter < MAX_ARR_SIZE)
+      do while (value <= upper_limit .and. iter < MAX_ARR_SIZE-1)
         x_array(iter) = value
         y_array(iter) = integrate_function(value)
         value = value + step
@@ -40,9 +40,11 @@
       integer, intent(in)   :: arr_size      
       real*8, intent(in)    :: h
       real*8                :: integral
-      real*8                :: array(MAX_ARR_SIZE)
+      real*8                :: array(0:MAX_ARR_SIZE)
       real*8                :: array_sum=0
-      do i = 1, arr_size / 2 + 1
+      array_sum = 0
+      integral  = 0
+      do i = 0, arr_size / 2 + 1
         array_sum = array_sum + array(i)
       end do      
       integral = h/2 * (array(0) + 2*array_sum + array(arr_size-1))
@@ -51,12 +53,18 @@
       function integral_calculation(step) result(integral)
       use constants
       real*8    :: integral
-      real*8    :: x_list(MAX_ARR_SIZE)
-      real*8    :: y_list(MAX_ARR_SIZE)
+      real*8    :: x_list(0:MAX_ARR_SIZE)
+      real*8    :: y_list(0:MAX_ARR_SIZE)
       real*8    :: h, step
       real*8    :: integral_by_trapezoid
       integer :: list_size
       call fill_arrays(x_list, y_list, list_size, step)
+c$$$      print *, step, "###"
+c$$$      do i = 0, list_size-1
+c$$$         print *, "x", x_list(i)
+c$$$         !print *, "y", y_list(i)
+c$$$      end do
+c$$$      print *,list_size, "!!!"
       h = (x_list(list_size-1) - x_list(0)) / list_size
       integral = integral_by_trapezoid(y_list, list_size, h)      
       end function integral_calculation
@@ -88,10 +96,14 @@
       real*8 :: integral
       real*8 :: accuracy
       real*8 :: stp=1
+      write(*, '(5es16.4e3)') eps_4
+!     print *, eps_4
       !call fill_arrays(x_list, y_list, list_size, start_step/2)
       call check_accuracy(integral, accuracy, stp)
       print*, "integral",integral,"accuracy",accuracy
-c$$$      do while (iter < list_size)
+      write(*, '(5es16.4e3)') integral
+      write(*, '(5es16.4e3)') accuracy
+c$$$  do while (iter < list_size)
 c$$$        print*, "x",x_list(iter),"y",y_list(iter)
 c$$$        iter = iter + 1
 c$$$      enddo
