@@ -41,13 +41,13 @@ int main()
 	void start(float80_t epsilon)
 	{
 		float80_t accuracy_trapezoidal = 0;
-		float80_t integral_trapezoidal = trapezoidal_rule(integrate_function, LOW_LIMIT, UP_LIMIT, epsilon, &accuracy_trapezoidal);	
+		float80_t integral_trapezoidal = trapezoidal_rule(integrate_function, LOW_LIMIT, UP_LIMIT, epsilon, &accuracy_trapezoidal);
 	
 		float80_t accuracy_simpson = 0;
 		float80_t integral_simpson = simpson_rule(integrate_function, LOW_LIMIT, UP_LIMIT, epsilon, &accuracy_simpson);
 	
-		printf("trapezoidal: %.15Lf =::= epsilon: %Lf =::= accuracy: %.15Lf\n", integral_trapezoidal, epsilon, accuracy_trapezoidal);
-		printf("simpson    : %.15Lf =::= epsilon: %Lf =::= accuracy: %.15Lf\n", integral_simpson, epsilon, accuracy_simpson);
+		printf("trapezoidal: %.10Lf =::= epsilon: %Lf =::= accuracy: %.10Lf\n", integral_trapezoidal, epsilon, accuracy_trapezoidal);
+		printf("simpson    : %.10Lf =::= epsilon: %Lf =::= accuracy: %.10Lf\n", integral_simpson, epsilon, accuracy_simpson);
 	}
 
 	start(EPS_4);
@@ -64,7 +64,7 @@ float80_t trapezoidal_rule(func_ptr integrate_function, float80_t lower_limit, f
 float80_t simpson_rule(func_ptr integrate_function, float80_t lower_limit, float80_t upper_limit, float80_t eps, float80_t *accuracy)
 {
 	RULE = SIMPSON;
-	accuracy_coef = 15;
+	accuracy_coef = 3;
 	return integrate(integrate_function, lower_limit, upper_limit, eps, accuracy);
 }
 
@@ -106,7 +106,7 @@ static float80_t integral_calculation(func_ptr integrate_function, float80_t ste
 			x_list[arr_iter] = x_value;		
 			y_list[arr_iter] = integrate_function(x_value);				
 		}
-	float80_t h = (x_list[arr_iter-1] - x_list[0]) / arr_iter;
+	float80_t h = (upper_integration_limit - lower_integration_limit) / arr_iter;
 	
 	switch (RULE) {
 	case TRAPEZOIDAL:
@@ -126,7 +126,8 @@ static float80_t integral_calculation(func_ptr integrate_function, float80_t ste
 
 static int check_accuracy(func_ptr integrate_function, float80_t step, float80_t *integral, float80_t *accuracy)
 {
-	float80_t integral_tmp = 0;
+	float80_t integral_old = 0;
+	float80_t integral_new = 0;
 	float80_t accuracy_tmp = 0;
 	int ret = 0;
 	if (integral == NULL) {
@@ -134,14 +135,13 @@ static int check_accuracy(func_ptr integrate_function, float80_t step, float80_t
 		ret = -1;
 		goto out;
 	}
-	
+	integral_old = integral_calculation(integrate_function, step);
 	do {
-		integral_tmp = integral_calculation(integrate_function, step);
-		accuracy_tmp = fabs(integral_calculation(integrate_function, step / 2) - integral_tmp);
-		step /= 10;
+		integral_new = integral_calculation(integrate_function, step /= 2);
+		accuracy_tmp = fabs(integral_old - integral_new);
+		integral_old = integral_new;	       
 	} while(epsilon <= accuracy_tmp / accuracy_coef);
-
-	(*integral) = integral_tmp;
+	(*integral) = integral_new;
 	if(accuracy != NULL) {
 		(*accuracy) = accuracy_tmp;
 	}
@@ -155,7 +155,7 @@ static float80_t integral_by_trapezoidal(float80_t *y_list, int y_list_size, flo
 	float80_t y_list_sum = 0;						
 	for(int i = 1; i < y_list_size-1; ++i) {			
 		y_list_sum += y_list[i];				
-	}								
+	}
 	return h/2 * (y_list[0] +					
 		      2 * y_list_sum +					
 		      y_list[y_list_size-1]);					
@@ -165,12 +165,14 @@ static float80_t integral_by_simpson(float80_t *y_list, int y_list_size, float80
 {
 	float80_t sum_by_odd_index = 0;
 	float80_t sum_by_even_index = 0;
-	int i;
-	for(i = 1; i < y_list_size / 2; ++i) {
-		sum_by_odd_index += y_list[2 * i];
-	}
-	for(i = 1; i < y_list_size / 2 + 1; ++i) {
-		sum_by_even_index += y_list[2 * i - 1];
+	int i;	
+	for(i = 1; i < y_list_size-1; ++i) {
+		if (i % 2 == 0) {
+			sum_by_odd_index += y_list[i];
+		}
+		else {
+			sum_by_even_index += y_list[i];
+		}
 	}
         return h/3 * (y_list[0] +
                       y_list[y_list_size-1] +
