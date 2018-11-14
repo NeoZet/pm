@@ -79,8 +79,11 @@ static int readEquations(FILE *fd, double **matrix, double *extension, int order
 {
 	double matrix_tmp[SYSTEM_ORDER][SYSTEM_ORDER] = {{1.80, 2.50, 4.60},
 							 {3.10, 2.30, -1.20},
-							 {4.51,-1.80,3.60}};
-	double extension_tmp[SYSTEM_ORDER] = {2.20,3.60,-1.70};
+							 {4.51,-1.80,3.60}};/* {{5.0, 1.0, 0.0, -1.0}, */
+							/*  {3.0, -3.0, 1.0, 4.0}, */
+							/*  {3.0, 0.0, -2.0, 1.0}, */
+							/*  {1.0, -4.0, 0.0, 1.0}}; */
+	double extension_tmp[SYSTEM_ORDER] = /* {-9.0,-7.0,-16.0,0.0}; */{2.20,3.60,-1.70};
 	if (matrix == NULL || extension == NULL) {		
 		return -1;
 	}
