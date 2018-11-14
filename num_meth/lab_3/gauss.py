@@ -1,5 +1,5 @@
 def gauss(A, b):
-    def _check_main_elem():
+    def _prepare_main_elem():
         for i in range(len(b)):
             for j in range(len(b)):
                 if(i != j and A[i][i] == 0 and A[j][i] != 0 and A[i][j] != 0):                    
@@ -8,7 +8,7 @@ def gauss(A, b):
                     b[j],b[i] = b[i],b[j]
                     break
 
-    _check_main_elem()
+    _prepare_main_elem()
     for i in range(len(b)):
         if A[i][i] == 0:
             return 'e'
@@ -17,12 +17,12 @@ def gauss(A, b):
             for t in range(i, len(b)):
                 A[j][t] -= tmp * A[i][t]
             b[j] -= tmp * b[i]
-    x = [0 for i in range(len(b))]
+    solve = [0 for i in range(len(b))]
     for i in reversed(range(0, len(b))):
         sum_known_elems = 0
         for j in range(i, len(b)):
-            sum_known_elems += A[i][j] * x[j]
-        x[i] = (b[i] - sum_known_elems) / A[i][i]
+            sum_known_elems += A[i][j] * solve[j]
+        solve[i] = (b[i] - sum_known_elems) / A[i][i]
     return x;
 
 M = [[1.80, 2.50, 4.60],
