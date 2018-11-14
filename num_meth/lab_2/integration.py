@@ -14,7 +14,7 @@ def trapezoidal_rule(integrate_function, lower_limit, upper_limit, epsilon):
         accuracy = abs(_integral(step / 2) - integral) / 3
         if accuracy < epsilon:
             return [integral, accuracy]
-        return _check_accuracy(epsilon, step / 2)
+        return _check_accuracy(epsilon, step / 10)
 
     return _check_accuracy(epsilon, 1)
 
@@ -35,7 +35,7 @@ def simpson_rule(integrate_function, lower_limit, upper_limit, epsilon):
         accuracy = abs(_integral(step / 2) - integral) / 15
         if accuracy < epsilon:
             return [integral, accuracy]
-        return _check_accuracy(epsilon, step / 2)
+        return _check_accuracy(epsilon, step / 10)
                     
     return _check_accuracy(epsilon, 1)
     

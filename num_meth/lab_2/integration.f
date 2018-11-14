@@ -138,6 +138,28 @@
       call check_accuracy(1, eps_4, integral, accuracy, stp)
       print *, "SIMPSON"
       print *, "epsilon:"
+      write(*, '(5es16.5e3)') eps_4
+      print *, "integral:"
+      write(*, '(5es16.5e3)') integral
+      print *, "accuracy:"
+      write(*, '(5es16.5e3)') accuracy
+      print *, "=============================="
+      
+      stp = 1
+      call check_accuracy(0, eps_5, integral, accuracy, stp)
+      print *, "TRAPEZIODAL"
+      print *, "epsilon:"
+      write(*, '(5es16.5e3)') eps_5
+      print *, "integral:"
+      write(*, '(5es16.5e3)') integral
+      print *, "accuracy:"
+      write(*, '(5es16.5e3)') accuracy
+      print *, "=============================="
+
+      stp = 1
+      call check_accuracy(1, eps_5, integral, accuracy, stp)
+      print *, "SIMPSON"
+      print *, "epsilon:"
       write(*, '(5es16.5e3)') eps_5
       print *, "integral:"
       write(*, '(5es16.5e3)') integral
