@@ -54,10 +54,10 @@
       return
       end subroutine gauss 
       
-      function resid(n,m,solve,b)
-      real, dimension(n,n) :: m
-      real, dimension(n) :: b,solve
-      resid=maxval(abs(matmul(m,solve)-b));
+      function resid(n,matr,solve,extesion)
+      real, dimension(n,n) :: matr
+      real, dimension(n) :: extesion,solve
+      resid=maxval(abs(matmul(matr,solve)-extesion));
       end function resid
       
       program main
