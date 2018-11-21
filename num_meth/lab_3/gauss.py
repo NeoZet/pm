@@ -31,6 +31,6 @@ M = [[1.80, 2.50, 4.60],
 c = [2.20,3.60,-1.70]
 
 solve = gauss(M,c)
-print("Can't solved!") if solve is 'e' else print(solve)
+print("Решений Нет!") if solve == 'e' else [print('X{0} = {1}'.format(i, solve[i])) for i in range(len(c))]
 
 
