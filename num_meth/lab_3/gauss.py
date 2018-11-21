@@ -23,7 +23,7 @@ def gauss(A, b):
         for j in range(i, len(b)):
             sum_known_elems += A[i][j] * solve[j]
         solve[i] = (b[i] - sum_known_elems) / A[i][i]
-    return x;
+    return solve;
 
 M = [[1.80, 2.50, 4.60],
      [3.10, 2.30, -1.20],
