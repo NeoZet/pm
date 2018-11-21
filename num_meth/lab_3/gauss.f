@@ -54,28 +54,35 @@
       return
       end subroutine gauss 
       
-      function resid(n,matr,solve,extesion)
-      real, dimension(n,n) :: matr
-      real, dimension(n) :: extesion,solve
-      resid=maxval(abs(matmul(matr,solve)-extesion));
-      end function resid
+c$$$      function resid(n, matr, solve, extesion)
+c$$$      real, dimension(n,n) :: matr
+c$$$      real, dimension(n) :: extesion, solve
+c$$$      real, dimension(n) :: resid
+c$$$      resid = matmul(matr, solve) - extesion
+c$$$      resid = maxval(abs(matmul(matr,solve) - extesion))
+c$$$      end function resid
       
       program main
       IMPLICIT NONE
       integer :: n
       parameter (n=3)
       real, dimension(n,n) :: matrix
-      real, dimension(n) :: extension,x
-      real :: resid
+      real, dimension(n) :: extension, solve, resid
+      real :: norm 
 !matrix(1,:)=(/0., 0., 0./)
       matrix(1,:)=(/1.80, 2.50, 4.60/)
       matrix(2,:)=(/3.10, 2.30, -1.20/)
       matrix(3,:)=(/4.51, -1.80, 3.60/)
       extension =(/2.20,3.60,-1.70/)    
 
-      call gauss(n,matrix,extension,x)
-      print*,'X1 = ',x(1)
-      print*,'X2 = ',x(2)
-      print*,'X3 = ',x(3)
-      print*,'resid = ',resid(n,matrix,x,extension)
+      call gauss(n, matrix, extension, solve)
+
+      resid = matmul(matrix, solve) - extension
+      norm = maxval(abs(resid))
+
+      print*,'X1 = ',solve(1)
+      print*,'X2 = ',solve(2)
+      print*,'X3 = ',solve(3)
+      print*,'resid = (', resid, ')'
+      print*,'resid norm = ', norm
       end program main

@@ -31,7 +31,7 @@ function solve = gauss(A, b, order)
             b(j) -= tmp * b(i);
         end
     end
-    solve = zeros(order);
+    solve = zeros(order,1);
     for i=order:-1:1
         sum_known_elems = 0;
         for j=1:order
@@ -41,11 +41,22 @@ function solve = gauss(A, b, order)
     end
 end
 
+function resid_res = resid(A, b, solve)
+    resid_res = (A * solve).' - b;
+end
+
 solve = gauss(A,b,ORDER);
+residial = resid(A, b, solve);
+
 if solve == "e"
     printf("Решений нет!\n");
 else
     for i=1:ORDER
         printf("X%d = %f\n", i, solve(i));
     end
+    printf("=================================\n");
+    for i=1:ORDER
+        printf("F%d = %f\n", i, residial(i));
+    end
+    printf("Residial norm: %f\n", max(abs(residial)));
 end

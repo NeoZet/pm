@@ -25,12 +25,28 @@ def gauss(A, b):
         solve[i] = (b[i] - sum_known_elems) / A[i][i]
     return solve;
 
+def resid(A, b, solve):
+    F = []
+    for i in range (len(A)):
+        res = 0
+        for j in range (len(solve)):
+            res += A[i][j] * solve[j]
+        F.append(res - b[i])
+    return F
+
 M = [[1.80, 2.50, 4.60],
      [3.10, 2.30, -1.20],
      [4.51,-1.80,3.60]]
 c = [2.20,3.60,-1.70]
 
 solve = gauss(M,c)
-print("Решений Нет!") if solve == 'e' else [print('X{0} = {1}'.format(i, solve[i])) for i in range(len(c))]
+if solve == 'e':
+    print("Решений Нет!")
+else:
+    [print('X{0} = {1}'.format(i, solve[i])) for i in range(len(c))]
+    residial = resid(M, c, solve)
+    print('resid = ({0})'.format(residial))
+    norm = max([abs(residial[i]) for i in range(len(residial))])
+    print('resid norm = {0}'.format(norm))
 
 
