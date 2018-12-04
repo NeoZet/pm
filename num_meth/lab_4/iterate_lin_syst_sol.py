@@ -35,26 +35,46 @@ def read_system(filename):
     
 
 def jacobi_method(system, extens, eps):
+    iter = 0
     D = [[system[i][j] if i == j else 0 for i in range(len(system))] for j in range(len(system))]
     invers_D = [[1/D[i][i] if i == j else 0 for i in range(len(D))] for j in range(len(D))]
     E = unit_matr(len(system))
     C = sub_matr(E, mulmatr(invers_D, system))
     b = mulmatr(invers_D, trans_matr([extens]))
-    x_k = [[1] for i in range(len(system))]
-    norm = 1
+    solve = [[1] for i in range(len(system))]
+    norm = 1+eps
     while norm > eps:        
-        x_k_prev = x_k
-        x_k = add_matr(mulmatr(C, x_k), b)
-        norm = max(map(abs, sub_matr(trans_matr(x_k_prev), trans_matr(x_k))[0]))
-    return x_k
-    
-    
+        solve_prev = solve
+        solve = add_matr(mulmatr(C, solve), b)
+        norm = max(map(abs, sub_matr(trans_matr(solve_prev), trans_matr(solve))[0]))
+        iter += 1
+    return [list(*zip(*solve)), iter]
+
+
+def gauss_seidel_method(system, extens, eps):
+    norm = 1+eps
+    iter = 0
+    solve_prev = [1 for i in range(len(system))]
+    while norm > eps:
+        solve = [0 for i in range(len(system))]
+        for i in range(len(system)):
+            solve[i] = (-sum([system[i][j] * solve[j] for j in range(i)])
+                        -sum([system[i][j] * solve_prev[j] for j in range(i+1, len(system))])
+                        + extens[i]) / system[i][i]
+        norm = (max(map(abs, sub_vect(solve, solve_prev))) /
+                max(map(abs, solve)))
+        solve_prev = solve
+        iter += 1
+    return [solve, iter]
+
+
 def main():
     init_cond_filename = default_init_cond_filename
     if len(sys.argv) == 2:
         init_cond_filename = sys.argv[1]
     A, b = read_system(init_cond_filename)    
     print(jacobi_method(A, b, 0.0001))
+    print(gauss_seidel_method(A, b, 0.0001))
     
 if __name__ == '__main__':
     main()

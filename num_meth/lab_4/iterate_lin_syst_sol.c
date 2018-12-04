@@ -4,8 +4,8 @@
 
 #define DEFAULT_ORDER 3
 
-int jacobi(double **matrix, double *extension, int order, double eps, double *solve);
-int gauss_seidel(double **matrix, double *extension, int order, double eps, double *solve);
+int jacobi(double **matrix, double *extension, int order, double eps, double *solve, int *iter);
+int gauss_seidel(double **matrix, double *extension, int order, double eps, double *solve, int *iter);
 
 static int readEquations(char *filename, double ***matrix, double **extension, int *order);
 static int resid(double **matrix, double *extension, double *solve, int order, double *resid);
@@ -15,7 +15,7 @@ static double accuracy(double *solv_curr, double *solv_prev, int order);
 int main(int argc, char *argv[])	
 {
 	int i;
-	int order;
+	int order;	
 	double **matrix;
 	double *extension;
 	if (argc != 2) {
@@ -30,14 +30,15 @@ int main(int argc, char *argv[])
 		printf("Matrix read error: %d\n", ret);
 		return ret;
 	}
+	int iter;
 	printf("JACOBI METHOD\n--------------\n");
-	ret = jacobi(matrix, extension, order, 0.0001, solve);
+	ret = jacobi(matrix, extension, order, 0.0001, solve, &iter);
 	if (ret != 0) {
 		printf("JACOBI: Equation calculatoin error: %d\n", ret);
 		return ret;
 	}
 
-	printf("========\n");
+	printf("ITERATIONS: %d\n========\n", iter);
 	for (i = 0; i < order; ++i) {
 		printf("X%d = %lf\n", i+1, solve[i]);
 	}
@@ -60,13 +61,13 @@ int main(int argc, char *argv[])
 	printf("Resid norm: %lf\n", residial_norm);
 
 	printf("\n******************\nGAUSS_SEIDEL METHOD\n--------------\n");
-	ret = gauss_seidel(matrix, extension, order, 0.0001, solve);
+	ret = gauss_seidel(matrix, extension, order, 0.0001, solve, &iter);
 	if (ret != 0) {
-		printf("JACOBI: Equation calculatoin error: %d\n", ret);
+		printf("GAUSS_SEIDEL: Equation calculatoin error: %d\n", ret);
 		return ret;
 	}
 
-	printf("========\n");
+	printf("ITERATIONS: %d\n========\n", iter);
 	for (i = 0; i < order; ++i) {
 		printf("X%d = %lf\n", i+1, solve[i]);
 	}
@@ -91,10 +92,10 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-int jacobi(double **matrix, double *extension, int order, double eps, double *solve)
+int jacobi(double **matrix, double *extension, int order, double eps, double *solve, int *iter)
 {
 	int i, j;	
-	int iter = 0;
+	*iter = 0;
 	double sum = 0;
 	double *solve_prev = (double*)calloc(order, sizeof(double));
 	do {		
@@ -108,15 +109,16 @@ int jacobi(double **matrix, double *extension, int order, double eps, double *so
 				return -1;
 			}
 			solve[i] = (sum + extension[i]) / matrix[i][i];
-		}		
+		}
+		++(*iter);
 	} while (accuracy(solve, solve_prev, order) > eps);
 	return 0;
 }
 
-int gauss_seidel(double **matrix, double *extension, int order, double eps, double *solve)
+int gauss_seidel(double **matrix, double *extension, int order, double eps, double *solve, int *iter)
 {
 	int i, j;	
-	int iter = 0;
+	*iter = 0;
 	double sum_l = 0;
 	double sum_r = 0;
 	double *solve_prev = (double*)calloc(order, sizeof(double));
@@ -138,6 +140,7 @@ int gauss_seidel(double **matrix, double *extension, int order, double eps, doub
 			}
 			solve[i] = (sum_l + sum_r + extension[i]) / matrix[i][i];
 		}
+		++(*iter);
 	} while (accuracy(solve, solve_prev, order) > eps);
 	return 0;
 }
