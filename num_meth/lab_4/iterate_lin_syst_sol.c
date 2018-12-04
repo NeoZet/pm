@@ -5,11 +5,12 @@
 #define SYSTEM_ORDER 3
 
 int jacobi(double **matrix, double *extension, int order, double eps, double *solve);
+int gauss_seidel(double **matrix, double *extension, int order, double eps, double *solve);
 
 static int readEquations(FILE *fd, double **matrix, double *extension, int order);
 static int resid(double **matrix, double *extension, double *solve, int order, double *resid);
 static int resid_norm(double *resid, int order, double *norm);
-static int convergence(double **matrix, double *extens, double *approx, int order, double eps);
+static double accuracy(double *solv_curr, double *solv_prev, int order);
 
 int main()
 {
@@ -29,10 +30,10 @@ int main()
 		printf("Matrix read error: %d\n", ret);
 		return ret;
 	}
-
+	printf("JACOBI METHOD\n--------------\n");
 	ret = jacobi(matrix, extension, order, 0.0001, solve);
 	if (ret != 0) {
-		printf("Equation calculatoin error: %d\n", ret);
+		printf("JACOBI: Equation calculatoin error: %d\n", ret);
 		return ret;
 	}
 
@@ -57,45 +58,115 @@ int main()
 		return ret;
 	}	
 	printf("Resid norm: %lf\n", residial_norm);
+
+	printf("\n******************\nGAUSS_SEIDEL METHOD\n--------------\n");
+	ret = gauss_seidel(matrix, extension, order, 0.0001, solve);
+	if (ret != 0) {
+		printf("JACOBI: Equation calculatoin error: %d\n", ret);
+		return ret;
+	}
+
+	printf("========\n");
+	for (i = 0; i < order; ++i) {
+		printf("X%d = %lf\n", i+1, solve[i]);
+	}
+	printf("========\n");
+
+	ret = resid(matrix, extension, solve, order, residial);
+	if (ret != 0) {
+		printf("Resid calculatoin error: %d\n", ret);
+		return ret;
+	}
+	for (i = 0; i < order; ++i) {
+		printf("F%d = %lf\n", i+1, residial[i]);
+	}
+
+	ret = resid_norm(residial, order, &residial_norm);
+	if (ret != 0) {
+		printf("Resid norm calculatoin error: %d\n", ret);
+		return ret;
+	}	
+	printf("Resid norm: %lf\n", residial_norm);
+	
 	return 0;
 }
 
 int jacobi(double **matrix, double *extension, int order, double eps, double *solve)
 {
-	int i, j;
-	float sum;
+	int i, j;	
 	int iter = 0;
-	
-	while (convergence(matrix, extension, solve, order, eps)) {
-		for (i = 0; i < order; i++) {
+	double sum = 0;
+	double *solve_prev = (double*)calloc(order, sizeof(double));
+	do {		
+		for (i = 0; i < order; ++i) {
 			sum = 0;
-			for (j = 0; j < order; j++) {
-				if (i != j) {
-					sum = sum + (matrix[i][j] * solve[j]);
-				} 
+			solve_prev[i] = solve[i];
+			for (j = 0; j < order; ++j) {
+				sum += (i != j ? (- matrix[i][j] * solve[j]) : 0);
 			}
-			solve[i] = (extension[i] - sum) / matrix[i][i];
-		}
-	}
+			if (matrix[i][i] == 0) {
+				return -1;
+			}
+			solve[i] = (sum + extension[i]) / matrix[i][i];
+		}		
+	} while (accuracy(solve, solve_prev, order) > eps);
 	return 0;
 }
 
-static int convergence(double **matrix, double *extens, double *approx, int order, double eps) {
-	int i, j;
-	float sum;
-
-	for (i = 0; i < order; i++) {
-		sum = 0;
-		for (j = 0; j < order; j++) {
-			sum = sum + (matrix[i][j] * approx[j]);  
+int gauss_seidel(double **matrix, double *extension, int order, double eps, double *solve)
+{
+	int i, j;	
+	int iter = 0;
+	double sum_l = 0;
+	double sum_r = 0;
+	double *solve_prev = (double*)calloc(order, sizeof(double));
+	do {
+		for (i = 0; i < order; ++i) {
+			solve_prev[i] = solve[i];
 		}
-
-		if(fabs(sum - extens[i]) > eps) {
-			return 1;
+		for (i = 0; i < order; ++i) {			
+			sum_l = 0;
+			sum_r = 0;			
+			for (j = 0; j < i; ++j) {
+				sum_l += (- matrix[i][j] * solve[j]);
+			}
+			for (j = i+1; j < order; ++j) {
+				sum_r += (- matrix[i][j] * solve_prev[j]);
+			}			
+			if (matrix[i][i] == 0) {
+				return -1;
+			}
+			solve[i] = (sum_l + sum_r + extension[i]) / matrix[i][i];
 		}
-	}
+	} while (accuracy(solve, solve_prev, order) > eps);
 	return 0;
 }
+
+
+static double accuracy(double *solv_curr, double *solv_prev, int order)
+{
+	int i;
+	double max_abs_sub = 0;
+	double max_abs_curr = 0;
+	for (i = 0; i < order; ++i) {
+		solv_prev[i] = solv_curr[i] - solv_prev[i];
+	}
+	for (i = 0; i < order; ++i) {
+		if (fabs(solv_curr[i]) > max_abs_curr) {
+			max_abs_curr = fabs(solv_curr[i]);
+		}
+		if (fabs(solv_prev[i]) > max_abs_sub) {
+			max_abs_sub = fabs(solv_prev[i]);
+		}
+	}
+	if (max_abs_curr != 0) {
+		return max_abs_sub / max_abs_curr;
+	}
+	else {
+		return 0;
+	}
+}
+
 	
 static int readEquations(FILE *fd, double **matrix, double *extension, int order)
 {
