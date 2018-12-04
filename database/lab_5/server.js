@@ -10,12 +10,11 @@ http.createServer(function(req, res) {
 		'Content-Type': 'text/html'
 	});
 	var client = db.create();
-	// console.log(client);
 	var rules_callbacks = {
-		'/fname': db.findByFirstName
-		// '/lname': findInLast,
-		// '/age': findInAge,
-		// '/id': findInID
+		'/fname': db.findByFirstName,
+		'/lname': db.findByLastName,
+		'/age'  : db.findByAge,
+		'/id'   : db.findByID
 	};
 	if (request[0].localeCompare('/') == 0) {
 		fs.readFile("./ajax.html", function(err, cont) {
@@ -27,8 +26,7 @@ http.createServer(function(req, res) {
 		request[0].localeCompare('/id') == 0) {
 		findInDB(client, request[1], rules_callbacks[request[0]])
 			.then(resolve => {
-				let http_str = html_format(resolve);
-				console.log(resolve.rows);
+				let http_str = html_format(resolve.rows);
 				return http_str;
 			})
 			.then(http_str => {
@@ -41,54 +39,53 @@ http.createServer(function(req, res) {
 
 function findInDB(client, pattern, rules_callback) {
 	return new Promise((resolve, reject) => {
-		db.findByFirstName(client, pattern)
+		rules_callback(client, pattern)
 			.then(function(res) {
 				resolve(res);
 			});
 	});
 }
 
-var findInFirst = function(rows, pattern) {
-	result_list = [];
-	for (var i = 0; i < rows.length; i++) {
-		if (rows[i]['first_name'].indexOf(pattern) > -1) {
-			result_list.push(rows[i]);
-		}
-	}
-	return result_list;
-}
+// var findInFirst = function(rows, pattern) {
+// 	result_list = [];
+// 	for (var i = 0; i < rows.length; i++) {
+// 		if (rows[i]['first_name'].indexOf(pattern) > -1) {
+// 			result_list.push(rows[i]);
+// 		}
+// 	}
+// 	return result_list;
+// }
 
 
-var findInLast = function(rows, pattern) {
-	result_list = [];
-	for (var i = 0; i < rows.length; i++) {
-		if (rows[i].LAST_NAME.indexOf(pattern) > -1) {
-			result_list.push(rows[i]);
-		}
-	}
-	return result_list;
-}
+// var findInLast = function(rows, pattern) {
+// 	result_list = [];
+// 	for (var i = 0; i < rows.length; i++) {
+// 		if (rows[i]['last_name'].indexOf(pattern) > -1) {
+// 			result_list.push(rows[i]);
+// 		}
+// 	}
+// 	return result_list;
+// }
 
-var findInAge = function(rows, pattern) {
-	result_list = [];
-	for (var i = 0; i < rows.length; i++) {
-		if (rows[i].AGE.toString().indexOf(pattern) > -1) {
-			result_list.push(rows[i]);
-		}
-	}
-	return result_list;
-}
+// var findInAge = function(rows, pattern) {
+// 	result_list = [];
+// 	for (var i = 0; i < rows.length; i++) {
+// 		if (rows[i]['age'].indexOf(pattern) > -1) {
+// 			result_list.push(rows[i]);
+// 		}
+// 	}
+// 	return result_list;
+// }
 
-var findInID = function(rows, pattern) {
-	result_list = [];
-	for (var i = 0; i < rows.length; i++) {
-		if (rows[i].ID.toString().indexOf(pattern) > -1) {
-			result_list.push(rows[i]);
-		}
-	}
-	return result_list;
-}
-
+// var findInID = function(rows, pattern) {
+// 	result_list = [];
+// 	for (var i = 0; i < rows.length; i++) {
+// 		if (rows[i]['id'].indexOf(pattern) > -1) {
+// 			result_list.push(rows[i]);
+// 		}
+// 	}
+// 	return result_list;
+// }
 
 function html_format(rows) {
 	var str = '<!DOCTYPE html>\n' +
@@ -105,9 +102,9 @@ function html_format(rows) {
 		'</tr>\n';
 	for (var i = 0; i < rows.length; i++) {
 		str += '<tr>\n' +
-			'<td style="color: black">\n' + rows[i].LAST_NAME + ' ' + rows[i].FIRST_NAME + '</td>\n' +
-			'<td id="str" align="center">\n' + rows[i].AGE + '</td>\n' +
-			'<td id="numb1" align="center">\n' + rows[i].ID + '</td>\n' +
+			'<td style="color: black">\n' + rows[i]['last_name'] + ' ' + rows[i]['first_name'] + '</td>\n' +
+			'<td id="str" align="center">\n' + rows[i]['age'] + '</td>\n' +
+			'<td id="numb1" align="center">\n' + rows[i]['id'] + '</td>\n' +
 			'</tr>\n';
 	}
 	str += '</table>\n' +

@@ -21,10 +21,6 @@ function createDb() {
 			return client.execute(query);
 		})
 		.then(function() {
-			const query = "CREATE CUSTOM INDEX ON lab5.persons ( FIRST_NAME ) USING 'org.apache.cassandra.index.sasi.SASIIndex' WITH OPTIONS = {'analyzed' : 'true','analyzer_class' : 'org.apache.cassandra.index.sasi.analyzer.NonTokenizingAnalyzer','case_sensitive' : 'false', 'mode' : 'CONTAINS'}";
-			return client.execute(query);
-		})
-		.then(function() {
 			var query = "INSERT INTO lab5.persons (ID, FIRST_NAME, LAST_NAME, AGE) VALUES (?, ?, ?, ?)";
 
 			params = [1111, "Erofei", "Pavlov", 23];
@@ -72,8 +68,37 @@ function createDb() {
 }
 
 function findByFirstName(clt, pattern) {
-	const query = "SELECT * FROM lab5.persons where FIRST_NAME LIKE ?";
+	query = "CREATE CUSTOM INDEX IF NOT EXISTS ON lab5.persons ( FIRST_NAME ) USING 'org.apache.cassandra.index.sasi.SASIIndex' WITH OPTIONS = {'analyzed' : 'true','analyzer_class' : 'org.apache.cassandra.index.sasi.analyzer.NonTokenizingAnalyzer','case_sensitive' : 'false', 'mode' : 'CONTAINS'}";
+	client.execute(query);
+	query = "SELECT * FROM lab5.persons where FIRST_NAME LIKE ?";
 	return clt.execute(query, ['%' + pattern + '%'], {
+		prepare: true
+	});
+}
+
+function findByLastName(clt, pattern) {
+	query = "CREATE CUSTOM INDEX IF NOT EXISTS last_idx ON lab5.persons ( LAST_NAME ) USING 'org.apache.cassandra.index.sasi.SASIIndex' WITH OPTIONS = {'analyzed' : 'true','analyzer_class' : 'org.apache.cassandra.index.sasi.analyzer.NonTokenizingAnalyzer','case_sensitive' : 'false', 'mode' : 'CONTAINS'}";
+    client.execute(query);
+	query = "SELECT * FROM lab5.persons where LAST_NAME LIKE ?";
+	return clt.execute(query, ['%' + pattern + '%'], {
+		prepare: true
+	});
+}
+
+function findByAge(clt, pattern) {
+	query = "CREATE INDEX IF NOT EXISTS ON lab5.persons ( AGE )";
+	client.execute(query);
+	query = "SELECT * FROM lab5.persons where AGE = ?";
+	return clt.execute(query, [pattern], {
+		prepare: true
+	});
+}
+
+function findByID(clt, pattern) {
+	// query = "CREATE CUSTOM INDEX IF NOT EXISTS ON lab5.persons ( ID )";
+	// client.execute(query);
+	query = "SELECT * FROM lab5.persons where ID = ?";
+	return clt.execute(query, [pattern], {
 		prepare: true
 	});
 }
@@ -95,3 +120,6 @@ function run() {
 
 module.exports.create = createDb;
 module.exports.findByFirstName = findByFirstName;
+module.exports.findByLastName = findByLastName;
+module.exports.findByAge = findByAge;
+module.exports.findByID = findByID;
