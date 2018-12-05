@@ -198,11 +198,11 @@ static int readEquations(char *filename, double ***matrix, double **extension, i
 	double elem;
 	for (i = 0; i < order_tmp; ++i) {
 		for (j = 0; j < order_tmp; ++j) {
-			fscanf(fd, "%lf,", &(*matrix)[i][j]);
+			fscanf(fd, "%lf", &(*matrix)[i][j]);
 		}
 	}
 	for (i = 0; i < order_tmp; ++i) {
-		fscanf(fd, "%lf,", &(*extension)[i]);
+		fscanf(fd, "%lf", &(*extension)[i]);
 	}
 	return 0;
 }

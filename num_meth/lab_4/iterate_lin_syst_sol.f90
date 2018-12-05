@@ -11,14 +11,15 @@ program  Main
   real :: norm
 
   Nmax = 50
-  FNAME = 'sf'
+  FNAME = 'data'
   open(10, file=FNAME,action='read')
   read(10,*) N
   allocate(matrix(N,N), extens(N), sol(N))
   do i=1, N
-     read(10,*) (matrix(i,j), j=1, N), extens(i)
+     read(10,*) (matrix(i,j), j=1, N)
   end do
-
+  read(10,*) extens
+  
   write(6,*) ' Jacobi Method '
   write(6,*) '*********************'
   call  Jacobi(N, Nmax, matrix, extens, sol, NUM_ITERATIONS)

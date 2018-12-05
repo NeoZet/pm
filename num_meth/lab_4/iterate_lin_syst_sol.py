@@ -28,9 +28,9 @@ def mulmatr(A, B):
 def read_system(filename):
     with open(filename, 'r') as data_file:
         order = int(data_file.readline())
-        A = [[float(elem) for elem in row.split(',')] for row in [next(data_file)
+        A = [[float(elem) for elem in row.split(" ")] for row in [next(data_file)
                                                                   for line in range(order)]]
-        b = [float(elem) for elem in next(data_file).split(',')]
+        b = [float(elem) for elem in next(data_file).split(" ")]
         return [A, b]
     
 
