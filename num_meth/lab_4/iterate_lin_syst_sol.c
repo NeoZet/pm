@@ -188,7 +188,6 @@ static int readEquations(char *filename, double ***matrix, double **extension, i
 	
 	fscanf(fd, "%d", &order_tmp);
 	*order = order_tmp;
-	printf("%d\n", order_tmp);
 	int i, j;
 	(*matrix) = (double**)malloc(sizeof(double*) * order_tmp);
 	for (i = 0; i < order_tmp; ++i) {
