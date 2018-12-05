@@ -67,14 +67,39 @@ def gauss_seidel_method(system, extens, eps):
         iter += 1
     return [solve, iter]
 
+def resid(A, b, solve):
+    F = []
+    for i in range (len(A)):
+        res = 0
+        for j in range (len(solve)):
+            res += A[i][j] * solve[j]
+        F.append(res - b[i])
+    return F
+
 
 def main():
     init_cond_filename = default_init_cond_filename
     if len(sys.argv) == 2:
         init_cond_filename = sys.argv[1]
-    A, b = read_system(init_cond_filename)    
-    print(jacobi_method(A, b, 0.0001))
-    print(gauss_seidel_method(A, b, 0.0001))
+    A, b = read_system(init_cond_filename)
+
+    solve, iter_num = jacobi_method(A, b, 0.0001)
+    print("Jacobi\n********")
+    print("Iterations: {0}".format(iter_num))
+    [print('X{0} = {1}'.format(i, solve[i])) for i in range(len(solve))]
+    residial = resid(A, b, solve)
+    print('resid = ({0})'.format(residial))
+    norm = max([abs(residial[i]) for i in range(len(residial))])
+    print('resid norm = {0}'.format(norm))
+    
+    solve, iter_num = gauss_seidel_method(A, b, 0.0001)
+    print("\nGauss-Seidel\n********")
+    print("Iterations: {0}".format(iter_num))
+    [print('X{0} = {1}'.format(i, solve[i])) for i in range(len(solve))]
+    residial = resid(A, b, solve)
+    print('resid = ({0})'.format(residial))
+    norm = max([abs(residial[i]) for i in range(len(residial))])
+    print('resid norm = {0}'.format(norm))
     
 if __name__ == '__main__':
     main()
