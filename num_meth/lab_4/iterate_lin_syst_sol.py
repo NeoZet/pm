@@ -47,6 +47,9 @@ def jacobi_method(system, extens, eps):
         solve_prev = solve
         solve = add_matr(mulmatr(C, solve), b)
         norm = max(map(abs, sub_matr(trans_matr(solve_prev), trans_matr(solve))[0]))
+        if norm > 1:
+            print ("Система расходится")
+            return ['e', 0]
         iter += 1
     return [list(*zip(*solve)), iter]
 
@@ -63,6 +66,9 @@ def gauss_seidel_method(system, extens, eps):
                         + extens[i]) / system[i][i]
         norm = (max(map(abs, sub_vect(solve, solve_prev))) /
                 max(map(abs, solve)))
+        if norm > 1:
+            print ("Система расходится")
+            return ['e', 0]
         solve_prev = solve
         iter += 1
     return [solve, iter]
@@ -85,6 +91,8 @@ def main():
     A, b = read_system(init_cond_filename)
 
     solve, iter_num = jacobi_method(A, b, 0.0001)
+    if solve == 'e':
+        return 0
     print("Jacobi\n********")
     print("Iterations: {0}".format(iter_num))
     [print('X{0} = {1}'.format(i, solve[i])) for i in range(len(solve))]
@@ -94,6 +102,8 @@ def main():
     print('resid norm = {0}'.format(norm))
     
     solve, iter_num = gauss_seidel_method(A, b, 0.0001)
+    if solve == 'e':
+        return 0
     print("\nGauss-Seidel\n********")
     print("Iterations: {0}".format(iter_num))
     [print('X{0} = {1}'.format(i, solve[i])) for i in range(len(solve))]

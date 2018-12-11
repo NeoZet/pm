@@ -32,12 +32,12 @@ int main(int argc, char *argv[])
 	}
 	int iter;
 	printf("JACOBI METHOD\n--------------\n");
-	ret = jacobi(matrix, extension, order, 0.0001, solve, &iter);
+	ret = jacobi(matrix, extension, order, 0.001, solve, &iter);
 	if (ret != 0) {
 		printf("JACOBI: Equation calculatoin error: %d\n", ret);
 		return ret;
 	}
-
+	
 	printf("ITERATIONS: %d\n========\n", iter);
 	for (i = 0; i < order; ++i) {
 		printf("X%d = %lf\n", i+1, solve[i]);
@@ -60,8 +60,12 @@ int main(int argc, char *argv[])
 	}	
 	printf("Resid norm: %lf\n", residial_norm);
 
+
+	for (i = 0; i< order; ++i) {
+		solve[i] = 0;
+	}
 	printf("\n******************\nGAUSS_SEIDEL METHOD\n--------------\n");
-	ret = gauss_seidel(matrix, extension, order, 0.0001, solve, &iter);
+	ret = gauss_seidel(matrix, extension, order, 0.001, solve, &iter);
 	if (ret != 0) {
 		printf("GAUSS_SEIDEL: Equation calculatoin error: %d\n", ret);
 		return ret;
@@ -98,10 +102,14 @@ int jacobi(double **matrix, double *extension, int order, double eps, double *so
 	*iter = 0;
 	double sum = 0;
 	double *solve_prev = (double*)calloc(order, sizeof(double));
-	do {		
+	double accur = 0;
+	for (i = 0; i < order; ++i) {
+		solve_prev[i] = solve[i];
+	}
+	do {
 		for (i = 0; i < order; ++i) {
 			sum = 0;
-			solve_prev[i] = solve[i];
+			//	solve_prev[i] = solve[i];
 			for (j = 0; j < order; ++j) {
 				sum += (i != j ? (- matrix[i][j] * solve[j]) : 0);
 			}
@@ -109,9 +117,14 @@ int jacobi(double **matrix, double *extension, int order, double eps, double *so
 				return -1;
 			}
 			solve[i] = (sum + extension[i]) / matrix[i][i];
-		}
+		}		
 		++(*iter);
-	} while (accuracy(solve, solve_prev, order) > eps);
+		accur = accuracy(solve, solve_prev, order);
+		for (i = 0; i < order; ++i) {
+			solve_prev[i] = solve[i];
+		}
+	} while (accur > eps);
+	free(solve_prev);
 	return 0;
 }
 
@@ -122,6 +135,7 @@ int gauss_seidel(double **matrix, double *extension, int order, double eps, doub
 	double sum_l = 0;
 	double sum_r = 0;
 	double *solve_prev = (double*)calloc(order, sizeof(double));
+	double accur = 0;
 	do {
 		for (i = 0; i < order; ++i) {
 			solve_prev[i] = solve[i];
@@ -141,7 +155,8 @@ int gauss_seidel(double **matrix, double *extension, int order, double eps, doub
 			solve[i] = (sum_l + sum_r + extension[i]) / matrix[i][i];
 		}
 		++(*iter);
-	} while (accuracy(solve, solve_prev, order) > eps);
+		accur = accuracy(solve, solve_prev, order);
+	} while (accur > eps);
 	return 0;
 }
 
