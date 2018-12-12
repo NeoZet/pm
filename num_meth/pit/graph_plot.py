@@ -3,6 +3,7 @@ import numpy as np
 import sys
 import argparse
 import decimal
+import matplotlib.animation as animation
 
 GRAPH_DATA_FILE = "graph_data.csv"
 
@@ -12,44 +13,39 @@ def _read_coords(filename):
 
 
 def getY(x, x_coord, y_coord):
-    ########## >>>> __get_y
+    def findY(n, x1, x2, x3, y1, y2, y3):
+        if n == x3:#n > x3 - 0.00001 and n < x3 + 0.00001:
+            return y3
+        elif n < x3:
+            x2 = x3
+            x3 = (x1 + x3) / 2
+            y2 = y3
+            y3 = (y1 + y3) / 2
+        elif n > x3:
+            x1 = x3
+            x3 = (x3 + x2) / 2
+            y1 = y3
+            y3 = (y3 + y2) / 2                        
+        return findY(n,
+                     float('{:.15f}'.format(x1)),
+                     float('{:.15f}'.format(x2)),
+                     float('{:.15f}'.format(x3)),
+                     float('{:.15f}'.format(y1)),
+                     float('{:.15f}'.format(y2)),
+                     float('{:.15f}'.format(y3)))
+
     def __get_y(n, x_coord, y_coord):
-        if int(n) % 2 == 0:
-            m1 = int(n)
-            m2 = m1 + 2
-            m3 = m1 + 1
-        else:
-            m3 = int(n)
-            m1 = m3 - 1
-            m2 = m3 + 1
-###########
-        t1 = y_coord[x_coord.index(m1)]
-        t2 = y_coord[x_coord.index(m2)]    
-        t3 = (t1 + t2) / 2
-            ########### >>>> findY
-        def findY(n, m1, m2, m3, t1, t2, t3):
-            if n < m3:
-                m2 = m3
-                m3 = (m1 + m3) / 2
-                t2 = t3
-                t3 = (t1 + t3) / 2
-            elif n > m3:
-                m1 = m3
-                m3 = (m3 + m2) / 2
-                t1 = t3
-                t3 = (t3 + t2) / 2
-            elif n == m3:
-                return t3
-            return findY(n,
-                         float('{:.10f}'.format(m1)),
-                         float('{:.10f}'.format(m2)),
-                         float('{:.10f}'.format(m3)),
-                         float('{:.10f}'.format(t1)),
-                         float('{:.10f}'.format(t2)),
-                         float('{:.10f}'.format(t3)))
-        ############ findY <<<<
-        return findY(n, m1, m2, m3, t1, t2, t3)
-    ########## __get_y <<<<
+        for i in range(len(x_coord)-1):
+            if n > x_coord[i] and n < x_coord[i+1]:
+                x3 = n
+                x1 = x_coord[i]
+                x2 = x_coord[i+1]
+                
+        y1 = y_coord[x_coord.index(x1)]
+        y2 = y_coord[x_coord.index(x2)]    
+        y3 = (y1 + y2) / 2
+        print(y3 /2)
+        return findY(n, x1, x2, x3, y1, y2, y3)
     
     if x > max(x_coord) or x < min(x_coord):
         print("Error: 'x' out of range", file=sys.stderr)
@@ -133,7 +129,7 @@ def cubic_spline(x_list, y_list, nodes_number):
     
     spline_y = [_spline_component_y(nodes_number, x_spline_points, y_spline_points, c, x) for x in x_spline_points]
     spline_y[-1] = y_list[-1]
-    spline = {"x" : x_spline_points, "y" : spline_y}
+    spline = [x_spline_points, spline_y]
     return spline
 
 
@@ -303,11 +299,87 @@ def create_parser():
                         dest='filename',
                         help='file with coordiantes of points',
                         type=str)
+    parser.add_argument('-b', '--ball',
+                        dest='ball',
+                        help='balls motion',
+                        type=float)
     parser.add_argument('-px', '--point_by_x',
                         help='print point on plot by X coordinate',
                         type=float)
     return parser
 
+
+
+def ball_motion(x_point):
+    fig=plt.figure()
+    coords = _read_coords("graph_data.csv")
+    x = [coord[0] for coord in coords]
+    y = [coord[1] for coord in coords]
+
+    x = []
+    x_ball=[]
+    y_ball=[]
+    delta_x=0.1
+    delta_t=0.03
+    resistance=0.07
+    g=9.81
+    for n in range(len(y)):
+        x.append(int (2*n))
+
+    temp_x = x_point
+
+    def find_y(temp_x):
+        x0=int (round(temp_x-0.5))
+        if x0%2!=0:               
+            x0=x0-1               
+        if x0<2*(len(x)-1) and x0>=0:
+            y0=y[x0//2]              
+            y1=y[x0//2+1]
+            return (float (y0-(y0-y1)*(temp_x-x0)/2))
+    temp_y=find_y(temp_x)
+
+    def motion(now_x, now_velocity):
+        now_y=find_y(now_x)
+        a=g*(find_y(now_x)-find_y(now_x+delta_x))/pow(pow(find_y(now_x)-find_y(now_x+delta_x),2)+pow(delta_x,2),0.5)
+        velocity=now_velocity+a*delta_t
+        s=velocity*delta_t
+        next_x=now_x+s/pow(((pow((find_y(now_x+delta_x)-find_y(now_x))/delta_x,2))+1),0.5)
+        velocity-=s*resistance
+        next_y=find_y(next_x)
+        x_ball.append(next_x)
+        y_ball.append(next_y)
+        return(next_x,velocity)
+
+
+    i=0
+    def animate(i):
+        ball.set_data(x_ball[i], y_ball[i])
+        return ball,
+
+    def plot_ball():
+        now_x=temp_x
+        velocity=0
+        x_ball.append(temp_x)
+        y_ball.append(temp_y)
+        while(abs(velocity)>=2 or (find_y(now_x+delta_x)-find_y(now_x))/delta_x!=0):
+            (now_x,velocity)=motion(now_x,velocity)
+
+    plot_ball()
+
+    ax=plt.axes(xlim=(0,287),ylim=(0,165))
+    
+    pit=ax.plot(x,y,'k')
+    pit=ax.grid()
+
+
+    plt.ylabel('y[mm]')
+    plt.xlabel('x[mm]')
+    plt.title ('Движение шарика по кривой')
+    ball, = ax.plot([0], [0], 'go')
+
+    ani = animation.FuncAnimation(fig, animate,  interval=10, blit=True, repeat=True)
+    plt.show()
+    
 def main():
     plot_exists = False
     parser = create_parser()
@@ -322,9 +394,13 @@ def main():
             return 1
     x_crd = [coord[0] for coord in coords]
     y_crd = [coord[1] for coord in coords]
-
-    plt.plot(x_crd, y_crd, label='Pit plot', linewidth=3)
-    
+    if args.ball:
+        if args.ball > x_crd[-1] or args.ball < x_crd[0]:
+            print("Point out of range")
+            exit(0)
+        ball_motion(args.ball)
+        exit(0)
+    plt.plot(x_crd, y_crd, label='Pit plot', linewidth=3)    
     x_coord = None
     if args.point_by_x and args.point_by_x >= min(x_crd) and args.point_by_x <= max(x_crd):
         x_coord = args.point_by_x
@@ -368,8 +444,8 @@ def main():
         if not args.nodes_number:
             print('WARNING! Incorrect number of nodes')
         else:
-            spline = cubic_spline(x_crd, y_crd, args.nodes_number)
-            plt.plot(spline["x"], spline["y"], label='Spline', linewidth=2)
+            spline_x, spline_y = cubic_spline(x_crd, y_crd, args.nodes_number)
+            plt.plot(spline_x, spline_y, label='Spline', linewidth=2)
             
     elif args.command == 'approx':
         plot_exists = True
@@ -414,3 +490,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    
