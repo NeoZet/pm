@@ -315,7 +315,7 @@ def ball_motion(x_point):
     coords = _read_coords("graph_data.csv")
     x = [coord[0] for coord in coords]
     y = [coord[1] for coord in coords]
-
+    velocity_ball = []
     x = []
     x_ball=[]
     y_ball=[]
@@ -359,6 +359,7 @@ def ball_motion(x_point):
     def plot_ball():
         now_x=temp_x
         velocity=0
+        velocity_ball.append(velocity)
         x_ball.append(temp_x)
         y_ball.append(temp_y)
         while(abs(velocity)>=2 or (find_y(now_x+delta_x)-find_y(now_x))/delta_x!=0):
@@ -371,13 +372,16 @@ def ball_motion(x_point):
     pit=ax.plot(x,y,'k')
     pit=ax.grid()
 
-
     plt.ylabel('y[mm]')
     plt.xlabel('x[mm]')
     plt.title ('Движение шарика по кривой')
     ball, = ax.plot([0], [0], 'go')
-
+    
     ani = animation.FuncAnimation(fig, animate,  interval=10, blit=True, repeat=True)
+
+    plt.figure(2)
+    print(x_ball[0], velocity_ball[0])
+#    plt.plot(x_ball, velocity_ball)
     plt.show()
     
 def main():
