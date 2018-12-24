@@ -119,13 +119,11 @@ static ssize_t lfs_write_tasks_file(struct file *filp, const char *buf,
 	memset(tmp, 0, TMPSIZE);
 	if (copy_from_user(tmp, buf, count))
 		return -EFAULT;
-	printk(KERN_INFO "OOOOOOOKYYYYYY | %s\nffffdwqdqwdq\n", tmp);
 
 	if (kstrtoul(tmp, 10, &task)) {
 		return -EFAULT;
 	}
 	atomic_set(counter, task);
-	printk(KERN_INFO "%ld\n###################ffffdwqdqwdq\n", task);
 	return count;
 }
 
@@ -167,12 +165,8 @@ static struct dentry *lfs_create_file (struct super_block *sb,
 	}
 
 	if (!strncmp(name, "tasks", 5)) {
-		printk(KERN_INFO "dqadwqdqwdqw\n");
 		inode->i_fop = &lfs_tasks_file_ops;
 		inode->i_private = (atomic_t*)value;
-	}
-	else {
-		printk(KERN_INFO "3333333333333333333333333333\n");
 	}
 
 	d_add(dentry, inode);
@@ -185,43 +179,12 @@ out_dput:
 }
 
 
-/* static struct dentry *lfs_create_dir (struct super_block *sb, */
-/* 		struct dentry *parent, const char *name) */
-/* { */
-/* 	struct dentry *dentry; */
-/* 	struct inode *inode; */
-/* 	struct qstr qname; */
-
-/* 	qname.name = name; */
-/* 	qname.len = strlen (name); */
-/* 	qname.hash = full_name_hash(name, qname.len); */
-/* 	dentry = d_alloc(parent, &qname); */
-/* 	if (! dentry) */
-/* 		goto out; */
-
-/* 	inode = lfs_make_inode(sb, S_IFDIR | 0644); */
-/* 	if (! inode) */
-/* 		goto out_dput; */
-/* 	inode->i_op = &simple_dir_inode_operations; */
-/* 	inode->i_fop = &simple_dir_operations; */
-
-/* 	d_add(dentry, inode); */
-/* 	return dentry; */
-
-/*   out_dput: */
-/* 	dput(dentry); */
-/*   out: */
-/* 	return 0; */
-/* } */
-
-
 static char cpus[TMPSIZE];
 static atomic_t tasks;
 
 static void lfs_create_files (struct super_block *sb, struct dentry *root)
 {
 	memcpy(cpus, "0\0", 2);
-//	memcpy(tasks, "\0", 1);
 	atomic_set(&tasks, 0);
 	lfs_create_file(sb, root, "cpus", &(*cpus));
 	lfs_create_file(sb, root, "tasks", (char*)(&tasks));
