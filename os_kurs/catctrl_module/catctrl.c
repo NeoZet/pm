@@ -34,6 +34,7 @@ static int lfs_open(struct inode *inode, struct file *filp)
 }
 
 #define TMPSIZE 20
+
 static ssize_t lfs_read_cpus_file(struct file *filp, char *buf,
 		size_t count, loff_t *offset)
 {
@@ -49,6 +50,23 @@ static ssize_t lfs_read_cpus_file(struct file *filp, char *buf,
 	*offset += count;
 	return count;
 }
+
+static ssize_t lfs_read_cache_file(struct file *filp, char *buf,
+		size_t count, loff_t *offset)
+{
+	char *counter = (char*) filp->private_data;
+	int len;
+	char tmp[TMPSIZE];
+	len = snprintf(tmp, TMPSIZE, "%s", counter);
+	if (count > len - *offset)
+		count = len - *offset;
+
+	if (copy_to_user(buf, tmp, count))
+		return -EFAULT;
+	*offset += count;
+	return count;
+}
+
 
 static ssize_t lfs_read_tasks_file(struct file *filp, char *buf,
 		size_t count, loff_t *offset)
@@ -105,6 +123,34 @@ static ssize_t lfs_write_cpus_file(struct file *filp, const char *buf,
 }
 
 
+static ssize_t lfs_write_cache_file(struct file *filp, const char *buf,
+		size_t count, loff_t *offset)
+{
+	char tmp[TMPSIZE];
+	char *counter = (char*) filp->private_data;
+
+	memset(tmp, 0, TMPSIZE);
+	if (copy_from_user(tmp, buf, count)) {
+		return -EFAULT;
+	}
+
+	if (cpus_number > ((1 << nr_cpu_ids) - 1)) {
+		return -EINVAL;
+	}
+	
+	if (*offset != 0) {
+		return -EINVAL;
+	}
+	
+	if (count >= TMPSIZE) {
+		return -EINVAL;
+	} 	
+
+	memcpy(counter, tmp, TMPSIZE);
+	return count;
+}
+
+
 static ssize_t lfs_write_tasks_file(struct file *filp, const char *buf,
 		size_t count, loff_t *offset)
 {
@@ -132,6 +178,12 @@ static struct file_operations lfs_cpus_file_ops = {
 	.open	= lfs_open,
 	.read 	= lfs_read_cpus_file,
 	.write  = lfs_write_cpus_file
+};
+
+static struct file_operations lfs_cache_file_ops = {
+	.open	= lfs_open,
+	.read 	= lfs_read_cache_file,
+	.write  = lfs_write_cache_file
 };
 
 static struct file_operations lfs_tasks_file_ops = {
@@ -164,6 +216,11 @@ static struct dentry *lfs_create_file (struct super_block *sb,
 		inode->i_private = value;
 	}
 
+	if (!strncmp(name, "cache", 5)) {
+		inode->i_fop = &lfs_cache_file_ops;
+		inode->i_private = value;
+	}
+
 	if (!strncmp(name, "tasks", 5)) {
 		inode->i_fop = &lfs_tasks_file_ops;
 		inode->i_private = (atomic_t*)value;
@@ -180,13 +237,16 @@ out_dput:
 
 
 static char cpus[TMPSIZE];
+static char cache[TMPSIZE];
 static atomic_t tasks;
 
 static void lfs_create_files (struct super_block *sb, struct dentry *root)
 {
 	memcpy(cpus, "0\0", 2);
+	memcpy(cache, "ff\0", 3);
 	atomic_set(&tasks, 0);
 	lfs_create_file(sb, root, "cpus", &(*cpus));
+	lfs_create_file(sb, root, "cache", &(*cpus));
 	lfs_create_file(sb, root, "tasks", (char*)(&tasks));
 }
 
