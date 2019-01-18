@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>NEW Page</title>
+    </head>
+    <body>
+        <form id='first_name'>
+            Search by first name :: <input type="text" id="f_name" name="First name">
+        </form>
+        <a href="javascript:searchByFirstName()"><input type="submit" id="submit" value="First name"></a>
+        
+        <form id='last_name'>
+            Search by last name <span style='padding-left:4px;'></span> :: <input type="text" id="l_name" name="Last name">
+        </form>
+        <a href="javascript:searchByLastName()"><input type="submit" id="submit" value="Last name"></a>
+        
+        <form id='age'>
+            Search by age <span style='padding-left:53px;'></span> :: <input type="text" id="age" name="Age">
+        </form>
+        <a href="javascript:searchByAge()"><input type="submit" id="submit" value="Age"></a>
+        
+        <form id='score'>
+            Search by score <span style='padding-left:63px;'></span> :: <input type="text" id="score" name="Score">
+        </form>
+        <a href="javascript:searchByScore()"><input type="submit" id="submit" value="Score"></a>
+
+        <script type="text/javascript">
+                function readServerString(url, callback) {
+                var req = new XMLHttpRequest();
+                req.onreadystatechange = function() {
+                    if(req.readyState === 4) {
+                        if(req.status === 200) {
+                            callback(undefined, req.responseText);
+                        }
+                    }   
+                }
+                req.open("POST", url, true);
+                req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                req.send();
+            }
+
+            function searchByFirstName() {
+                readServerString("fname&"+document.forms["first_name"].elements["f_name"].value, function(err, res) {
+                    document.getElementById("call_res").innerHTML = html_format(JSON.parse(res));
+                });
+                document.forms["first_name"].reset();
+            }
+            function searchByLastName() {
+                readServerString("lname&"+document.forms["last_name"].elements["l_name"].value, function(err, res) {
+                    document.getElementById("call_res").innerHTML = html_format(JSON.parse(res));
+                });
+                document.forms["last_name"].reset();
+            }
+            function searchByAge() {
+                readServerString("age&"+document.forms["age"].elements["age"].value, function(err, res) {
+                    document.getElementById("call_res").innerHTML = html_format(JSON.parse(res));
+                });
+                document.forms["age"].reset();
+            }
+            function searchByScore() {
+                readServerString("score&"+document.forms["score"].elements["score"].value, function(err, res) {
+                    document.getElementById("call_res").innerHTML = html_format(JSON.parse(res));
+                });
+                document.forms["score"].reset();
+            }
+
+            function html_format(records) {
+                var str = '<!DOCTYPE html>\n' +
+                '<html>\n' +
+                '<head>\n' +
+                '<meta charset=\'utf-8\'>\n' +
+                '</head>\n' +
+                '<body>\n' +
+                '<table border="1px" cellspacing="0px" width="30%" height="10%">\n' +
+                '<tr>\n' +
+                '<td style="color: black">\nName</td>\n' +
+                '<td id="str" align="center">\nAge</td>\n' +
+                '<td id="numb1" align="center">\nScore</td>\n' +
+                '</tr>\n';
+                for (var i = 0; i < records.length; i++) {
+                    str += '<tr>\n' +
+                        '<td style="color: black">\n' + records[i]['LastName'] + ' ' + records[i]['FirstName'] + '</td>\n' +
+                        '<td id="str" align="center">\n' + records[i]['Age'] + '</td>\n' +
+                        '<td id="numb1" align="center">\n' + records[i]['Score'] + '</td>\n' +
+                        '</tr>\n';
+                }
+                str += '</table>\n' +
+                       '</body>\n' +
+                       '</html>\n';
+                return str;
+            }            
+
+        </script>
+        <span id="call_res"></span> 
+    </body>
+</html>
