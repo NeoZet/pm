@@ -26,7 +26,7 @@ http.createServer(function(req, res) {
 		request[0].localeCompare('/id') == 0) {
 		findInDB(client, request[1], rules_callbacks[request[0]])
 			.then(resolve => {
-				res.write(JSON.stringify(resolve));
+				res.write(JSON.stringify(resolve.rows));
 				res.end();
 			})
 	}

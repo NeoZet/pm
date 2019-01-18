@@ -41,6 +41,7 @@
 
             function searchByFirstName() {
                 readServerString("fname&"+document.forms["first_name"].elements["f_name"].value, function(err, res) {
+                    console.log(JSON.parse(res));
                     document.getElementById("call_res").innerHTML = html_format(JSON.parse(res));
                 });
                 document.forms["first_name"].reset();
@@ -76,14 +77,12 @@
                 '<td style="color: black">\nName</td>\n' +
                 '<td id="str" align="center">\nAge</td>\n' +
                 '<td id="numb1" align="center">\nID</td>\n' +
-                '<td id="str" align="center">\nCar</td>\n' +
                 '</tr>\n';
                 for (var i = 0; i < records.length; i++) {
                     str += '<tr>\n' +
-                        '<td style="color: black">\n' + records[i]['LastName'] + ' ' + records[i]['FirstName'] + '</td>\n' +
-                        '<td id="str" align="center">\n' + records[i]['Age'] + '</td>\n' +
-                        '<td id="numb1" align="center">\n' + records[i]['ID'] + '</td>\n' +
-                        '<td id="numb1" align="center">\n' + records[i]['Car'] + '</td>\n' +
+                        '<td style="color: black">\n' + records[i]['last_name'] + ' ' + records[i]['first_name'] + '</td>\n' +
+                        '<td id="str" align="center">\n' + records[i]['age'] + '</td>\n' +
+                        '<td id="numb1" align="center">\n' + records[i]['id'] + '</td>\n' +
                         '</tr>\n';
                 }
                 str += '</table>\n' +
