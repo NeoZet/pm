@@ -50,3 +50,44 @@ function findInDB(database, pattern, rules_callback) {
 		});	
 	});
 }
+
+var findInFirst = function (rows, pattern) {
+	result_list = [];
+	for(var i = 0; i < rows.length; i++) {	
+	    if(rows[i].FIRST_NAME.indexOf(pattern) > -1) {
+			result_list.push(rows[i]);   	
+	    }	    
+	}
+	return result_list;
+}
+
+
+var findInLast = function (rows, pattern) {
+	result_list = [];
+	for(var i = 0; i < rows.length; i++) {
+	    if(rows[i].LAST_NAME.indexOf(pattern) > -1) {
+			result_list.push(rows[i]);   	
+	    }
+	}
+	return result_list;
+}
+
+var findInAge = function (rows, pattern) {
+	result_list = [];
+	for(var i = 0; i < rows.length; i++) {
+	    if(rows[i].AGE.toString().indexOf(pattern) > -1) {
+			result_list.push(rows[i]);   	
+	    }	    
+	}
+	return result_list;
+}
+
+var findInID = function (rows, pattern) {
+	result_list = [];
+	for(var i = 0; i < rows.length; i++) {
+	    if(rows[i].ID.toString().indexOf(pattern) > -1) {
+			result_list.push(rows[i]);   	
+	    }	    
+	}
+	return result_list;
+}

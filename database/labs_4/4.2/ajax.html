@@ -76,14 +76,12 @@
                 '<td style="color: black">\nName</td>\n' +
                 '<td id="str" align="center">\nAge</td>\n' +
                 '<td id="numb1" align="center">\nID</td>\n' +
-                '<td id="str" align="center">\nCar</td>\n' +
                 '</tr>\n';
                 for (var i = 0; i < records.length; i++) {
                     str += '<tr>\n' +
-                        '<td style="color: black">\n' + records[i]['LastName'] + ' ' + records[i]['FirstName'] + '</td>\n' +
-                        '<td id="str" align="center">\n' + records[i]['Age'] + '</td>\n' +
+                        '<td style="color: black">\n' + records[i]['LAST_NAME'] + ' ' + records[i]['FIRST_NAME'] + '</td>\n' +
+                        '<td id="str" align="center">\n' + records[i]['AGE'] + '</td>\n' +
                         '<td id="numb1" align="center">\n' + records[i]['ID'] + '</td>\n' +
-                        '<td id="numb1" align="center">\n' + records[i]['Car'] + '</td>\n' +
                         '</tr>\n';
                 }
                 str += '</table>\n' +
