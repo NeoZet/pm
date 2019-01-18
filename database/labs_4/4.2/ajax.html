@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>NEW PAGE</title>
+        <title>NEW Page</title>
     </head>
     <body>
         <form id='first_name'>
@@ -25,7 +25,7 @@
         <a href="javascript:searchByID()"><input type="submit" id="submit" value="ID"></a>
 
         <script type="text/javascript">
-            function readServerString(url, callback) {
+                function readServerString(url, callback) {
                 var req = new XMLHttpRequest();
                 req.onreadystatechange = function() {
                     if(req.readyState === 4) {
@@ -41,28 +41,57 @@
 
             function searchByFirstName() {
                 readServerString("fname&"+document.forms["first_name"].elements["f_name"].value, function(err, res) {
-                    document.getElementById("call_res").innerHTML = res;
+                    document.getElementById("call_res").innerHTML = html_format(JSON.parse(res));
                 });
                 document.forms["first_name"].reset();
             }
             function searchByLastName() {
                 readServerString("lname&"+document.forms["last_name"].elements["l_name"].value, function(err, res) {
-                    document.getElementById("call_res").innerHTML = res;
+                    document.getElementById("call_res").innerHTML = html_format(JSON.parse(res));
                 });
                 document.forms["last_name"].reset();
             }
             function searchByAge() {
                 readServerString("age&"+document.forms["age"].elements["age"].value, function(err, res) {
-                    document.getElementById("call_res").innerHTML = res;
+                    document.getElementById("call_res").innerHTML = html_format(JSON.parse(res));
                 });
                 document.forms["age"].reset();
             }
             function searchByID() {
                 readServerString("id&"+document.forms["ID"].elements["id"].value, function(err, res) {
-                    document.getElementById("call_res").innerHTML = res;
+                    document.getElementById("call_res").innerHTML = html_format(JSON.parse(res));
                 });
                 document.forms["ID"].reset();
             }
+
+            function html_format(records) {
+                var str = '<!DOCTYPE html>\n' +
+                '<html>\n' +
+                '<head>\n' +
+                '<meta charset=\'utf-8\'>\n' +
+                '</head>\n' +
+                '<body>\n' +
+                '<table border="1px" cellspacing="0px" width="30%" height="10%">\n' +
+                '<tr>\n' +
+                '<td style="color: black">\nName</td>\n' +
+                '<td id="str" align="center">\nAge</td>\n' +
+                '<td id="numb1" align="center">\nID</td>\n' +
+                '<td id="str" align="center">\nCar</td>\n' +
+                '</tr>\n';
+                for (var i = 0; i < records.length; i++) {
+                    str += '<tr>\n' +
+                        '<td style="color: black">\n' + records[i]['LastName'] + ' ' + records[i]['FirstName'] + '</td>\n' +
+                        '<td id="str" align="center">\n' + records[i]['Age'] + '</td>\n' +
+                        '<td id="numb1" align="center">\n' + records[i]['ID'] + '</td>\n' +
+                        '<td id="numb1" align="center">\n' + records[i]['Car'] + '</td>\n' +
+                        '</tr>\n';
+                }
+                str += '</table>\n' +
+                       '</body>\n' +
+                       '</html>\n';
+                return str;
+            }            
+
         </script>
         <span id="call_res"></span> 
     </body>
