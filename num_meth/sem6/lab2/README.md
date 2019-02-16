@@ -1,0 +1,1 @@
+SNAE by Newton method
