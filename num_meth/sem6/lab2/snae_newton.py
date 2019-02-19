@@ -106,5 +106,7 @@ Iter   |      delta_1           |     delta_2
     print ('\nSolution:\nX1 = {0}\nX2 = {1}\n'.format(format_float(res['solution'][0]),
                                                     format_float(res['solution'][1])))
     print ('Newton iteration = ', res['iteration'])
+
+
 if __name__ == '__main__':
     main()
