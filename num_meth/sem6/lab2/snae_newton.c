@@ -30,6 +30,9 @@ int main()
 	
 	memset(x, 0, NUM_OF_EQ);
 	int ret = newton(f, x, NUM_OF_EQ, EPS_1, EPS_2, &res, &iter, d1, d2);
+	if (ret != 0) {
+		printf("Error: return code: %d\n", ret);
+	}
 	printf("Iter  |     delta_1      |     delta_2\n");
 	printf("--------------------------------------------\n");
 	for (int i = 0; i < iter; ++i) {
@@ -171,10 +174,16 @@ static int f(double *x, int num_of_eq, double **result)
 	(*result)[0] = 2 * x[1] - cos(x[0] + 1);
 	(*result)[1] = x[0] + sin(x[1]) + 0.4;
 	*/
+
+	/*
+	(*result)[0] = 2*x[0] - sin((x[0]-x[1])/2);
+	(*result)[1] = 2*x[1] - cos((x[0]+x[1])/2);
+	*/
+	
 	
 	(*result)[0] = powf(x[0], 2) - x[1] + 1;
 	(*result)[1] = x[0] - cos(M_PI/2 * x[1]);
-
+	
 out:
 	return ret;
 }
