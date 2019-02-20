@@ -102,11 +102,11 @@ Iter   |      delta_1           |     delta_2
     for iter, d1, d2 in zip(range(res['iteration']), res['delta_1'], res['delta_2']):
         print('''
   {0}    |      {1}      |     {2} '''.format(iter, format_float(d1), format_float(d2)))
+    print('---------------------------------------------------\n')
 
-    print ('\nSolution:\nX1 = {0}\nX2 = {1}\n'.format(format_float(res['solution'][0]),
-                                                    format_float(res['solution'][1])))
-    print ('Newton iteration = ', res['iteration'])
-
+    print('Solution:')
+    for i in range(len(res['solution'])):
+        print('X{0} = {1}'.format(i, format_float(res['solution'][i])))
 
 if __name__ == '__main__':
     main()
