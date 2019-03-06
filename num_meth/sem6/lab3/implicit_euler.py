@@ -18,7 +18,6 @@ def step(f):
     return min(tau)
 
 def f(u, t):
-    print(t)
     f = np.zeros([NUMBER_OF_EQUATIONS])
     f[0] = -u[0]*u[1] + np.sin(t) / t
     f[1] = -(u[1] ** 2) + a*t/(1+t**2)
@@ -33,12 +32,14 @@ def f_test(u, t):
 def euler():
     t_k = 0.00000001
     y_k = u_0
-    while t_k < T:        
+    k = 0
+    while t_k < T:
         f_vec = f(y_k, t_k)
         tau_k = step(f_vec)
         y_k = y_k + tau_k * f_vec
-        t_k += tau_k
-        print('Y {0} | T {1}'.format(y_k, t_k))
+        t_k += tau_k        
+        print('K: [{2}] | Y: {0} | T: {1}'.format(y_k, t_k, k))
+        k += 1
 
 
 if __name__ == '__main__':
