@@ -7,7 +7,8 @@
 #define NUM_OF_EQ 2
 
 static const double E_DOP = 0.00001;
-double u_0[2] = {0, -0.412};
+double _u_0[2] = {0, -0.412};
+double u_0[2] = {3, 0};
 int Om = 40;
 double tau_max = 0.01;
 double T = 1;
@@ -62,11 +63,11 @@ static int f(double *u, double t, double result[][NUM_OF_EQ])
 		goto out;
 	}       
 
-	/* (*result)[0] = -2*u[0] + 4*u[1]; */
-	/* (*result)[1] = -u[0] + 3*u[1]; */
+	(*result)[0] = -2*u[0] + 4*u[1];
+	(*result)[1] = -u[0] + 3*u[1];
 
-	(*result)[0] = -u[0]*u[1] + sin(t) / t;
-	(*result)[1] = -(u[1]*u[1]) + a*t/(1+t*t);
+	/* (*result)[0] = -u[0]*u[1] + sin(t) / t; */
+	/* (*result)[1] = -(u[1]*u[1]) + a*t/(1+t*t); */
 		
 out:
 	return ret;

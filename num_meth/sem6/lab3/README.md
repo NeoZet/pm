@@ -1,1 +1,2 @@
-Solving systems of differential equations by Implicit Euler method
+Solving systems of differential equations by Explicit Euler method
+
