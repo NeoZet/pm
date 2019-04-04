@@ -16,7 +16,6 @@ def explicit(equation, x0, F, eps):
     x = _expl_on_step(equation, x_prev, F)
     iter = 0
     while np.abs(x - x_prev) > eps:
-        print(x)
         x_prev = x
         x = _expl_on_step(equation, x_prev, F)
         iter += 1
@@ -25,7 +24,6 @@ def explicit(equation, x0, F, eps):
 
 def main():
     start_values = np.array([0.1, 0.001, 1])
-    x0 = 0.1
     
     eq_x_list = np.arange(-40, 40, 0.01)
     eq_y_list = np.array([func(x, 0) for x in eq_x_list])
@@ -44,11 +42,19 @@ def main():
     plt.ylim(-25, 30)
     plt.xlim(-20, 20)
 
-    print("Explicit iteration method")
-    explicit_solution, iterations = explicit(func, x0, F, EPS)
-    print('Solution: {0:.5f} | Iterations: {1}'.format(explicit_solution, iterations))
+    print('########################################\n')
+    print("Explicit iteration method\n")
+    for x in start_values:
+        print('Initial approximation: {0}'.format(x))
+        explicit_solution, iterations = explicit(func, x, F, EPS)
+        print('Solution: {0:.5f} | Iterations: {1}'.format(explicit_solution, iterations))
+        print('Accuracy: {0}'.format(func(explicit_solution, F)))
+        print('-----------------------------------------------')
+    print('\n########################################')
+
     plt.plot(eq_x_list, eq_y_list, linewidth=2, label="y = 6 - e^(-2x) + 2x")
-    plt.plot(F_x_list, F_y_list, linewidth=2, color='red', label="F = 1")
+    plt.plot(F_x_list, F_y_list, linewidth=2, color='red', label="F = -1")
+    
     plt.plot(explicit_solution,
              F,
              marker='o',
@@ -62,4 +68,3 @@ def main():
     
 if __name__ == '__main__':
     main()    
-    print(func(explicit(func, 0.1, F, EPS)[0], F))

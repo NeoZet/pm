@@ -65,11 +65,17 @@ def main():
     plt.ylim(-25, 30)
     plt.xlim(-20, 20)
 
-    print("Runge-Kutta's method")
-    runge_kutta_solution, iterations = runge_kutta(func, x0, F, EPS)
-    print('Solution: {0:.5f} | Iterations: {1}'.format(runge_kutta_solution, iterations))
+    print('########################################\n')
+    print("Runge-Kutta's method\n")
+    for x in start_values:
+        print('Initial approximation: {0}'.format(x))
+        runge_kutta_solution, iterations = runge_kutta(func, x, F, EPS)        
+        print('Solution: {0:.5f} | Iterations: {1}'.format(runge_kutta_solution, iterations))
+        print('Accuracy: {0}'.format(func(runge_kutta_solution, F)))
+        print('-----------------------------------------------')
+    print('\n########################################')
     plt.plot(eq_x_list, eq_y_list, linewidth=2, label="y = 6 - e^(-2x) + 2x")
-    plt.plot(F_x_list, F_y_list, linewidth=2, color='red', label="F = 1")
+    plt.plot(F_x_list, F_y_list, linewidth=2, color='red', label="F = -1")
     plt.plot(runge_kutta_solution,
              F,
              marker='o',
@@ -83,6 +89,5 @@ def main():
     
 if __name__ == '__main__':
     main()    
-    print(func(runge_kutta(func, 0.9, F, EPS)[0]))
 
 
