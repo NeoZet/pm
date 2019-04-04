@@ -42,7 +42,6 @@ def runge_kutta(equation, x0, F, eps):
 
         x += (1/2) * (k1 + 4*k4 + k5)
         t += h
-    print(iter)
     return x,iter
 
 def main():
@@ -62,10 +61,11 @@ def main():
                 color='b', labelcolor='black',
                 labelbottom=True, labeltop=False, labelleft=True, labelright=False)
 
-    plt.title("Runge-Kutta method")
+    plt.title("Runge-Kutta's method")
     plt.ylim(-25, 30)
     plt.xlim(-20, 20)
 
+    print("Runge-Kutta's method")
     runge_kutta_solution, iterations = runge_kutta(func, x0, F, EPS)
     print('Solution: {0:.5f} | Iterations: {1}'.format(runge_kutta_solution, iterations))
     plt.plot(eq_x_list, eq_y_list, linewidth=2, label="y = 6 - e^(-2x) + 2x")
@@ -79,11 +79,10 @@ def main():
     )
     plt.annotate("[{0:.5f}, {1}]".format(runge_kutta_solution, F), (runge_kutta_solution, F))
     plt.legend(loc='best')
-    plt.show()
+    plt.savefig('Runge-Kutta.png', dpi=300)
     
 if __name__ == '__main__':
     main()    
     print(func(runge_kutta(func, 0.9, F, EPS)[0]))
-#    print(runge_kutta(func, 0.9, F, EPS))
 
 

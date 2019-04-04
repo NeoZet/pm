@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+import sys
 EPS = 0.001
 F = 1
 
@@ -50,8 +50,9 @@ def main():
     plt.ylim(-25, 30)
     plt.xlim(-20, 20)
 
+    print("Bisection method")
     bisection_solution, iterations = bisection(func, LEFT_BOUND, RIGHT_BOUND, F, EPS)
-    print('Solution: {0} | Iterations: {1}'.format(bisection_solution, iterations))
+    print('Solution: {0:.5f} | Iterations: {1}'.format(bisection_solution, iterations))
     plt.plot(eq_x_list, eq_y_list, linewidth=2, label="y = 6 - e^(-2x) + 2x")
     plt.plot(F_x_list, F_y_list, linewidth=2, color='red', label="F = 1")
     plt.plot(bisection_solution,
@@ -63,7 +64,7 @@ def main():
     )
     plt.annotate("[{0:.5f}, {1}]".format(bisection_solution, F), (bisection_solution, F))
     plt.legend(loc='best')
-    plt.show()
+    plt.savefig('Bisection.png', dpi=300)
     
 if __name__ == '__main__':
     main()

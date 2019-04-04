@@ -40,12 +40,13 @@ def main():
                 color='b', labelcolor='black',
                 labelbottom=True, labeltop=False, labelleft=True, labelright=False)
 
-    plt.title("Explicit iteration method")
+    plt.title("Explicit iterative method")
     plt.ylim(-25, 30)
     plt.xlim(-20, 20)
 
+    print("Explicit iteration method")
     explicit_solution, iterations = explicit(func, x0, F, EPS)
-    print('Solution: {0} | Iterations: {1}'.format(explicit_solution, iterations))
+    print('Solution: {0:.5f} | Iterations: {1}'.format(explicit_solution, iterations))
     plt.plot(eq_x_list, eq_y_list, linewidth=2, label="y = 6 - e^(-2x) + 2x")
     plt.plot(F_x_list, F_y_list, linewidth=2, color='red', label="F = 1")
     plt.plot(explicit_solution,
@@ -57,7 +58,7 @@ def main():
     )
     plt.annotate("[{0:.5f}, {1}]".format(explicit_solution, F), (explicit_solution, F))
     plt.legend(loc='best')
-    plt.show()
+    plt.savefig('Explicit.png', dpi=300)
     
 if __name__ == '__main__':
     main()    
