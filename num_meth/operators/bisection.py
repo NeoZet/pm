@@ -15,6 +15,7 @@ def bisection_step(equation, x, F, left_bound, right_bound):
 
 def bisection(equation, left_bound, right_bound, F, eps):
     mid = (left_bound + right_bound) / 2
+    iter = 0
     while np.abs(left_bound - right_bound) and np.abs(equation(mid, F)) > eps:
         f_left = equation(left_bound, F)
         f_mid = equation(mid, F)
@@ -24,8 +25,9 @@ def bisection(equation, left_bound, right_bound, F, eps):
             left_bound = mid
         elif f_left * f_mid < 0:
             right_bound = mid
-        mid = (left_bound + right_bound) / 2    
-    return mid
+        mid = (left_bound + right_bound) / 2
+        iter += 1
+    return mid, iter
 
 
 def main():
@@ -48,8 +50,8 @@ def main():
     plt.ylim(-25, 30)
     plt.xlim(-20, 20)
 
-    bisection_solution = bisection(func, LEFT_BOUND, RIGHT_BOUND, F, EPS)
-    
+    bisection_solution, iterations = bisection(func, LEFT_BOUND, RIGHT_BOUND, F, EPS)
+    print('Solution: {0} | Iterations: {1}'.format(bisection_solution, iterations))
     plt.plot(eq_x_list, eq_y_list, linewidth=2, label="y = 6 - e^(-2x) + 2x")
     plt.plot(F_x_list, F_y_list, linewidth=2, color='red', label="F = 1")
     plt.plot(bisection_solution,
@@ -65,3 +67,4 @@ def main():
     
 if __name__ == '__main__':
     main()
+    print(func(bisection(func, -10, 10, F, EPS)[0], F))

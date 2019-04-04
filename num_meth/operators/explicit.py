@@ -3,26 +3,24 @@ import numpy as np
 
 EPS = 0.001
 F = 1
+t = 0.1 #magic number
 
 def func(x, F):
     return 6 - np.exp(-2 * x) + 2 * x - F
 
-def derivative(function, x, F, h=0.0001):
-    return (function(x + h, F) - function(x - h, F)) / (2 * h)
-
-
-def newton(equation, x0, F, eps):
-    def _newton_step(equation, x, F):
-        return (x - equation(x, F) / derivative(equation, x, F))
+def explicit(equation, x0, F, eps):
+    def _expl_on_step(eq, x_prev, F):
+        return x_prev - t * eq(x_prev, F)
     
-    x = x0
-    x_next = _newton_step(equation, x0, F)
+    x_prev = x0
+    x = _expl_on_step(equation, x_prev, F)
     iter = 0
-    while np.abs(x_next - x) > eps:
-        x = x_next
-        x_next = _newton_step(equation, x_next, F)
+    while np.abs(x - x_prev) > eps:
+        print(x)
+        x_prev = x
+        x = _expl_on_step(equation, x_prev, F)
         iter += 1
-    return x_next, iter
+    return x, iter
 
 
 def main():
@@ -42,27 +40,25 @@ def main():
                 color='b', labelcolor='black',
                 labelbottom=True, labeltop=False, labelleft=True, labelright=False)
 
-    plt.title("Newton's method")
+    plt.title("Explicit iteration method")
     plt.ylim(-25, 30)
     plt.xlim(-20, 20)
 
-    newton_solution, iterations = newton(func, x0, F, EPS)
-    print('Solution: {0} | Iterations: {1}'.format(newton_solution, iterations))
+    explicit_solution, iterations = explicit(func, x0, F, EPS)
+    print('Solution: {0} | Iterations: {1}'.format(explicit_solution, iterations))
     plt.plot(eq_x_list, eq_y_list, linewidth=2, label="y = 6 - e^(-2x) + 2x")
     plt.plot(F_x_list, F_y_list, linewidth=2, color='red', label="F = 1")
-    plt.plot(newton_solution,
+    plt.plot(explicit_solution,
              F,
              marker='o',
              markersize=4,
              color='black',
              label='solution'
     )
-    plt.annotate("[{0:.5f}, {1}]".format(newton_solution, F), (newton_solution, F))
+    plt.annotate("[{0:.5f}, {1}]".format(explicit_solution, F), (explicit_solution, F))
     plt.legend(loc='best')
     plt.show()
     
 if __name__ == '__main__':
-    main()
-    print(func(newton(func, 0.1, F, EPS)[0], F))
-    
-        
+    main()    
+    print(func(explicit(func, 0.1, F, EPS)[0], F))
