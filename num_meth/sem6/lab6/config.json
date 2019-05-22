@@ -1,0 +1,27 @@
+{
+    "a": 1.9,
+    "coords_info": {
+        "x_size": 50,
+        "y_size": 30,
+        "step": 0.7
+    },
+    "duration_info": {
+        "duration": 20,
+        "step": 0.1
+    },
+    "border_temperature": {
+        "left": 300,
+        "right": 300,
+        "top": 300,
+        "bottom": 300
+    },
+    "heat_source": {
+        "temperature": 1200,
+        "size": 3
+    },
+    "global_temperature_info": {
+        "max": 1200,
+        "min": -200,
+        "inital": 0
+    }
+}
