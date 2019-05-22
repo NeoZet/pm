@@ -103,12 +103,10 @@ def temperature_distribution_at_moment(params, current_distrib):
 	return T
 
 
-def calculate_and_animate_result(params, initial_and_border_cond, fig, save=False): 
+def calculate_and_animate_result(params, initial_and_border_cond, fig, im, save=False): 
 	min_temp = params["global_temperature_info"]["min"]
 	max_temp = params["global_temperature_info"]["max"]
 
-	im=plt.imshow(initial_and_border_cond, cmap='gist_rainbow_r', vmin=min_temp, vmax=max_temp)
-	
 	global T 
 	T = initial_and_border_cond
 	
@@ -129,7 +127,7 @@ def calculate_and_animate_result(params, initial_and_border_cond, fig, save=Fals
 	return ani
 
 
-def calculate_and_plot_result(params, initial_and_border_cond, save=False):
+def calculate_and_plot_result(params, initial_and_border_cond, im, save=False):
 	time = 0
 	time_end = params["duration_info"]["duration"]
 	tau = params["duration_info"]["step"]
@@ -141,9 +139,7 @@ def calculate_and_plot_result(params, initial_and_border_cond, save=False):
 	while time < time_end:
 		time += tau
 		T = temperature_distribution_at_moment(params, T)
-
-	plt.imshow(T, cmap='gist_rainbow_r', vmin=min_temp, vmax=max_temp)
-
+	im.set_data(T)
 	if save:
 		plt.savefig("res.png", dpi=200)
 	return 0
@@ -153,22 +149,24 @@ def calculate_and_display_results(params, type="plot", save=False):
 	min_temp = params["global_temperature_info"]["min"]
 	max_temp = params["global_temperature_info"]["max"]
 
-	fig = plt.figure()
-
 	initial_and_border_cond = setup_initial_and_border_conditions(params)
-	#[print(initial_and_border_cond[i]) for i in range(30)]
-	if type == "plot":
-		res = calculate_and_plot_result(params, initial_and_border_cond, save)
-	elif type == "anim":
-		res = calculate_and_animate_result(params, initial_and_border_cond, fig, save)
-	else:
-		print("INCORRECT DISPLAY TYPE")
-		return -1
+
+	fig = plt.figure()
+	im=plt.imshow(initial_and_border_cond, cmap='gist_rainbow_r', vmin=min_temp, vmax=max_temp)
 
 	levels = np.arange(min_temp, max_temp, 100)
 	c = plt.colorbar()
 	c.set_ticks(levels)
 	c.set_ticklabels(levels)
+
+	if type == "plot":
+		res = calculate_and_plot_result(params, initial_and_border_cond, im, save)
+	elif type == "anim":
+		res = calculate_and_animate_result(params, initial_and_border_cond, fig, im, save)
+	else:
+		print("INCORRECT DISPLAY TYPE")
+		return -1
+
 	if not save:
 		plt.show()
 	return res
