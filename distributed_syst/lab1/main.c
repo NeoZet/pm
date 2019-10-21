@@ -302,5 +302,10 @@ void print_usage(int32_t argc, char *argv[])
 {
 	if (argc != 0) {
 		printf("Usage: %s -p [N] -i INPTUT_PREFIX -o OUTPUT_PREFIX -n [N] -d [N]\n", argv[0]);
-	}		
+	}
+	printf("-p processes number\n"
+	       "-i input files prefix\n"
+	       "-o output files prefix\n"
+	       "-n number of vectors\n"
+	       "-d dimention of vectors\n");
 }
