@@ -22,14 +22,18 @@ typedef struct {
 } arguments_t;
 
 
+int print_output_file(char *out_file_name, double sum, double module, int pid, double calc_duration, int ppid);
+int parse_args(int argc, char *argv[], arguments_t *parsed_args);
+void print_usage(int argc, char *argv[]);
+
 int generate_vector(int dimention, vector_t *vector);
 int generate_vectors(int vectors_number, int dimention, vector_t *vectors);
 int vectors_sum(vector_t *vectors, int vectors_number, vector_t *sum);
 int vector_module(vector_t vector, double *module);
 
 int generate_files_names(int quantity, char *prefix, char generated_files[][MAX_FILE_NAME]);
-int parse_args(int argc, char *argv[], arguments_t *parsed_args);
-void print_usage(int argc, char *argv[]);
+int create_file_with_vector(char file_name[MAX_FILE_NAME], vector_t vector);
+int generate_files_with_vectors(char *files_prefix, int files_number, int vectors_number, int vectors_dimention);
 
 
 int main(int argc, char *argv[])
@@ -45,18 +49,19 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	//	printf("%d\n%s\n%s\n%d\n%d\n", args.processes_number, args.input_prefix, args.output_prefix, args.vectors_number, args.vectors_dimention);
-
- 	char input_files_names[args.processes_number][MAX_FILE_NAME];
-	char output_files_names[args.processes_number][MAX_FILE_NAME];
+ 	/* char input_files_names[args.processes_number][MAX_FILE_NAME]; */
+	/* char output_files_names[args.processes_number][MAX_FILE_NAME]; */
 	
-	if ((ret = generate_files_names(args.processes_number, args.input_prefix, input_files_names)) != 0) {
-		return ret;
-	}
+	/* if ((ret = generate_files_names(args.processes_number, args.input_prefix, input_files_names)) != 0) { */
+	/* 	return ret; */
+	/* } */
 
-	if ((ret = generate_files_names(args.processes_number, args.output_prefix, output_files_names)) != 0) {
-		return ret;
-	}
+	/* if ((ret = generate_files_names(args.processes_number, args.output_prefix, output_files_names)) != 0) { */
+	/* 	return ret; */
+	/* } */
+
+	generate_files_with_vectors(args.input_prefix, args.processes_number, args.vectors_number, args.vectors_dimention);
+	
 }
 
 
@@ -83,7 +88,7 @@ int generate_vector(int dimention, vector_t *vector)
 
 	vector->dimention = dimention;
 	for (int i = 0; i < dimention; i++) {
-		vector->components[i] = rand() % 23;
+		vector->components[i] = rand() % 112;
 	}
 
 	return 0;
@@ -104,6 +109,45 @@ int generate_vectors(int vectors_number, int dimention, vector_t *vectors)
 			return -2;
 		}
 		vectors[i] = tmp_vec;
+	}
+
+	return 0;
+}
+
+// TODO: add checking errno
+int create_file_with_vector(char file_name[MAX_FILE_NAME], vector_t vector)
+{
+	FILE *file = fopen(file_name, "w");
+	for (int i = 0; i < vector.dimention; i++) {
+		fprintf(file, "%lf ", vector.components[i]);
+	}
+	fclose(file);
+	return 0;
+}
+
+
+int generate_files_with_vectors(char *files_prefix, int files_number, int vectors_number, int vectors_dimention)
+{
+	int ret = 0;
+	if (files_prefix == NULL) {
+		printf("[generate_files_with_vectors] Invalid argument: NULL\n");
+		return -1;				
+	}
+
+	char input_files_names[files_number][MAX_FILE_NAME];
+	if ((ret = generate_files_names(files_number, files_prefix, input_files_names)) != 0) {
+		return ret;
+	}
+
+	vector_t vectors[vectors_number];
+	if ((ret = generate_vectors(vectors_number, vectors_dimention, vectors)) != 0) {
+		return ret;
+	}
+
+	for (int i = 0; i < files_number; i++) {
+		if ((ret = create_file_with_vector(input_files_names[i], vectors[i])) != 0) {
+			return ret;
+		}
 	}
 
 	return 0;
@@ -145,7 +189,24 @@ int vector_module(vector_t vector, double *module)
 	return 0;
 }
 
+// TODO: separate duration of calculation for sum and module
+int print_output_file(char *out_file_name, double sum, double module, int pid, double calc_duration, int ppid)
+{
+	if (out_file_name == NULL) {
+		printf("[print_output_file] Invalid file name: NULL\n");
+		return -1;
+	}
+	FILE *file = fopen(out_file_name, "w");
 
+	fprintf(file, "sum: %lf\n", sum);
+	fprintf(file, "module: %lf\n", module);
+	fprintf(file, "pid: %d\n", pid);
+	fprintf(file, "duration of calculation: %lf\n", calc_duration);
+	fprintf(file, "ppid: %d\n", ppid);
+
+	fclose(file);
+	return 0;
+}
 
 // TODO: re-work parser with getopt_long()
 int parse_args(int argc, char *argv[], arguments_t *parsed_args)
