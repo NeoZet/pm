@@ -54,6 +54,7 @@ int main(int32_t argc, char *argv[])
 		return 1;
 	}
 
+	srand(time(NULL));
 	char input_files_names[args.processes_number][MAX_FILE_NAME];
 	generate_files_with_vectors(args.input_prefix, args.processes_number, args.vectors_number, args.vectors_dimention, input_files_names);
 
