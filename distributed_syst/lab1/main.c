@@ -162,6 +162,10 @@ int32_t generate_vectors(int32_t vectors_number, int32_t dimention, vector_t *ve
 int32_t create_file_with_vectors(char file_name[MAX_FILE_NAME], vector_t *vectors, int32_t vectors_number)
 {
 	FILE *file = fopen(file_name, "w");
+	if (file == NULL) {
+		fprintf(stderr, "Unable to open file: %s\n", file_name);
+		return -1;
+	}
 	for (int32_t k = 0; k < vectors_number; k++) {
 		for (int32_t i = 0; i < vectors[k].dimention; i++) {
 			fprintf(file, "%lf ", vectors[k].components[i]);
