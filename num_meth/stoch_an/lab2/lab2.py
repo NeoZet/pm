@@ -37,13 +37,6 @@ def read_data_1d(filename):
         return None
     return [float(point) for point in raw_data.split(';')]
 
-def read_data_2d(filename):
-    raw_data = read_raw_data(filename)
-    if raw_data is None:
-        return None
-    data = [point.replace('(', '').replace(')', '').split(';') for point in raw_data.split(', ')]
-    return [{X_LABEL: float(point[0]), Y_LABEL: float(point[1])} for point in data if len(point) == 2]
-
 
 def dispers(data):
     dispers = 0
@@ -58,12 +51,7 @@ def standard_deviation(data):
 def mean(data):
     return sum(data) / len(data)
 
-def dispS(v, Xsr):
-	S2 = 0
-	n = len(v)
-	for i in range(n):
-		S2 += ((v[i] - Xsr)**2)
-	return np.sqrt((S2/(n-1)))
+
 
 if __name__ == '__main__':    
     parser = create_parser()
@@ -71,32 +59,40 @@ if __name__ == '__main__':
     if args.one_dimensional:
         data_1d = read_data_1d(args.one_dimensional)
         gamma = 0.95
-        lapl095 = 1.96
+        Z_alph95 = 1.96
         disp = dispers(data_1d)
         stand_dev = standard_deviation(data_1d)
         aver = mean(data_1d)
-        delta = lapl095 * stand_dev / np.sqrt(len(data_1d))
+        delta = Z_alph95 * stand_dev / np.sqrt(len(data_1d))
         print("Доверительный интервал при известной дисперсии D = {0}  для мат. ожидания (alpha = {1:.2f}):".format(disp, 1 - gamma))
         print("{0} < M < {1}".format(aver - delta, aver + delta))
 
+        t09 = 1.3070
+        t095 = 1.6909
+        t099 = 2.4411
 
-# n = len(v)
-# xsr = find_Xsr(v)
-# lapl095 = 1.96
-# disp = 300.0
+        delta = np.sqrt(disp/len(data_1d))
+        print("Доверительный интервал при неизвестной дисперсии D для мат. ожидания при alpha = 0.1:")
+        print(aver - t09*delta, "< M <", aver + t09*delta)
+        print("Доверительный интервал при неизвестной дисперсии D для мат. ожидания при alpha = 0.05:")
+        print(aver - t095*delta, "< M <", aver + t095*delta)
+        print("Доверительный интервал при неизвестной дисперсии D для мат. ожидания при alpha = 0.01:")
+        print(aver - t099*delta, "< M <", aver + t099*delta)
 
-# delta = lapl095*(disp**(0.5))/n**(0.5)
-# print("Доверительный интервал при известной дисперсии D =", disp, " для мат. ожидания при alpha = 0.05:")
-# print(xsr - delta, "< M <", xsr + delta)
+        alpha1 = 0.1
+        alpha05 = 0.05
+        alpha01 = 0.01
 
-# t09 = 1.3070
-# t095 = 1.6909
-# t099 = 2.4411
-# disp = dispS(v, xsr)
-# delta = disp/n**(0.5)
-# print("Доверительный интервал при неизвестной дисперсии D для мат. ожидания при alpha = 0.1:")
-# print(xsr - t09*delta, "< M <", xsr + t09*delta)
-# print("Доверительный интервал при неизвестной дисперсии D для мат. ожидания при alpha = 0.05:")
-# print(xsr - t095*delta, "< M <", xsr + t095*delta)
-# print("Доверительный интервал при неизвестной дисперсии D для мат. ожидания при alpha = 0.01:")
-# print(xsr - t099*delta, "< M <", xsr + t099*delta)
+        Z_al9 = 1.64
+        Z_al95 = 1.96
+        Z_al99 = 2.576
+
+        n = len(data_1d)
+        bottom_border = lambda al: ((n - 1) * disp) / ((n - 1) + al * np.sqrt(2 * (n - 1)))
+        top_border = lambda al: ((n - 1) * disp) / ((n - 1) - al * np.sqrt(2 * (n - 1)))
+        print("Доверительный интервал для дисперсии D = {0:.5f} при alpha = 0.1:".format(disp))
+        print("{0} < D < {1}".format(bottom_border(Z_al9), top_border(Z_al9)))
+        print("Доверительный интервал для дисперсии D = {0:.5f} при alpha = 0.05:".format(disp))
+        print("{0} < D < {1}".format(bottom_border(Z_al95), top_border(Z_al95)))
+        print("Доверительный интервал для дисперсии D = {0:.5f} при alpha = 0.01:".format(disp))
+        print("{0} < D < {1}".format(bottom_border(Z_al99), top_border(Z_al99)))                
