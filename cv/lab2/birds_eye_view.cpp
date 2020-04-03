@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
         return -1;
     }
     string transform_type(argv[2]);
+    cout << transform_type << endl;
     VideoCapture cap(argv[1]);
     if (!cap.isOpened()) {
         cout << "Unable to open file: " << argv[1] << endl;
@@ -34,26 +35,26 @@ int main(int argc, char *argv[])
     }
     
     Point2f src_points[4];
-    src_points[0] = Point(0,IMAGE_H + OFFSET);
-    src_points[1] = Point(1207, IMAGE_H + OFFSET);
-    src_points[2] = Point(0, OFFSET);
-    src_points[3] = Point(IMAGE_W, OFFSET);
+    // src_points[0] = Point(0,IMAGE_H + OFFSET);
+    // src_points[1] = Point(1207, IMAGE_H + OFFSET);
+    // src_points[2] = Point(0, OFFSET);
+    // src_points[3] = Point(IMAGE_W, OFFSET);
 
-    // src_points[0] = Point(450, OFFSET);
-    // src_points[1] = Point(IMAGE_W-300, OFFSET);
-    // src_points[2] = Point(IMAGE_W, IMAGE_H + OFFSET);
-    // src_points[3] = Point(0,IMAGE_H + OFFSET);
+    src_points[0] = Point(450, OFFSET);
+    src_points[1] = Point(IMAGE_W-300, OFFSET);
+    src_points[2] = Point(IMAGE_W, IMAGE_H + OFFSET);
+    src_points[3] = Point(0,IMAGE_H + OFFSET);
 
     Point2f dst_points[4];
-    dst_points[0] = Point(570, IMAGE_H);
-    dst_points[1] = Point(710, IMAGE_H);
-    dst_points[2] = Point(0, 0);
-    dst_points[3] = Point(IMAGE_W, 0);
+    // dst_points[0] = Point(570, IMAGE_H);
+    // dst_points[1] = Point(710, IMAGE_H);
+    // dst_points[2] = Point(0, 0);
+    // dst_points[3] = Point(IMAGE_W, 0);
 
-    // dst_points[0] = Point(0, 0);
-    // dst_points[1] = Point(IMAGE_W, 0);
-    // dst_points[2] = Point(IMAGE_W, IMAGE_H);
-    // dst_points[3] = Point(0, IMAGE_H);
+    dst_points[0] = Point(0, 0);
+    dst_points[1] = Point(IMAGE_W, 0);
+    dst_points[2] = Point(IMAGE_W, IMAGE_H);
+    dst_points[3] = Point(0, IMAGE_H);
 
     TRANSFORM_TYPE type;
     if (transform_type == "perspective") {
@@ -78,7 +79,6 @@ int main(int argc, char *argv[])
         if (frame.empty()) break;
 
         transform(frame, dst, M, type);
-
         imshow("src", frame);
         imshow("bird's eye view", dst);
         if ((char)waitKey(25) == 27) break;
