@@ -242,13 +242,6 @@ int parse_args(int32_t argc, char *argv[], arguments_t *parsed_args)
 
 void print_usage(int32_t argc, char *argv[])
 {
-    if (argc != 0)
-    {
-        printf("Usage: %s --rows-number-first [N] --cols-number-first [N] --rows-number-second [N] --cols-number-second [N]\n", argv[0]);
-    }
-    printf("--rows-number-first\n"
-           "--cols-number-first\n"
-           "--rows-number-second\n"
-           "--cols-number-second\n"           
-           "-h, --help print this help message\n");
+    printf("Usage: %s --rows-number-first [N] --cols-number-first [N] --rows-number-second [N] --cols-number-second [N]\n", argv[0]);
+    printf("-h, --help print this help message\n");
 }
