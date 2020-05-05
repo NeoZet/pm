@@ -1,8 +1,8 @@
 CC=gcc
-SRC = mpi_lab_3.c
-OBJ = mpi_lab_3.o
-CFLAGS=-lmpi
-TARGET=parallel_matrix_multiplication
+SRC = omp_pthread.c
+OBJ = omp_pthread.o
+CFLAGS=-lpthread -fopenmp -O0
+TARGET=omp_pthread
 
 all: main
 
@@ -10,10 +10,10 @@ main: $(OBJ)
 	$(CC) $(OBJ) -o $(TARGET) $(CFLAGS)
 
 $(OBJ): $(SRC)
-	gcc -c $(SRC)
+	$(CC) -c $(SRC)
 
 debug:
 	$(CC) $(OBJ) -o $(TARGET) $(CFLAGS) -g
 
 clean:
-	rm -rf $(TARGET) *[0-9] *~*
+	rm -rf $(TARGET) *[0-9] *~* *.o
